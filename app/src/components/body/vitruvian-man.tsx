@@ -35,7 +35,7 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
   const regions = [
     { id: "shoulders", label: "Shoulders", top: "27%", left: "18%", width: "64%", height: "7%" },
     { id: "chest", label: "Chest", top: "35%", left: "30%", width: "40%", height: "7%" },
-    { id: "upper_arm_r", label: "Arm", top: "34%", left: "72%", width: "12%", height: "10%" },
+
     { id: "waist", label: "Waist", top: "47%", left: "34%", width: "32%", height: "7%" },
     { id: "hips", label: "Hips", top: "54%", left: "32%", width: "36%", height: "7%" },
   ];
@@ -121,32 +121,7 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
               </g>
             );
           })}
-          {/* Arm measurement — horizontal across mid-bicep of right arm */}
-          {(() => {
-            const isArmActive = highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r";
-            const armLabel = getMeasurementLabel("upper_arm_r");
-            return (
-              <g>
-                <line
-                  x1="73%"
-                  y1="38%"
-                  x2="81%"
-                  y2="38%"
-                  stroke={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.35)"}
-                  strokeWidth={isArmActive ? "0.4" : "0.25"}
-                  strokeDasharray="1.5,1.5"
-                />
-                <circle cx="73" cy="38" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
-                <circle cx="81" cy="38" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
-                {isArmActive && armLabel && (
-                  <>
-                    <rect x="82.5" y="35.8" width="10" height="4.4" rx="1" fill="#0a0a0a" stroke="#ffffff" strokeWidth="0.3" opacity="0.9" />
-                    <text x="87.5" y="38.8" fill="#ffffff" fontSize="3" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{armLabel}</text>
-                  </>
-                )}
-              </g>
-            );
-          })()}
+
         </svg>
 
         {/* Clickable regions */}
