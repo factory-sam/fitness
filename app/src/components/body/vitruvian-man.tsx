@@ -33,16 +33,16 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
   };
 
   const regions = [
-    { id: "shoulders", label: "Shoulders", top: "24%", left: "18%", width: "64%", height: "7%" },
-    { id: "chest", label: "Chest", top: "32%", left: "30%", width: "40%", height: "7%" },
-    { id: "upper_arm_r", label: "Arm", top: "30%", left: "70%", width: "12%", height: "16%" },
+    { id: "shoulders", label: "Shoulders", top: "27%", left: "18%", width: "64%", height: "7%" },
+    { id: "chest", label: "Chest", top: "35%", left: "30%", width: "40%", height: "7%" },
+    { id: "upper_arm_r", label: "Arm", top: "34%", left: "72%", width: "12%", height: "10%" },
     { id: "waist", label: "Waist", top: "47%", left: "34%", width: "32%", height: "7%" },
     { id: "hips", label: "Hips", top: "54%", left: "32%", width: "36%", height: "7%" },
   ];
 
   const measurementLines = [
-    { id: "shoulders", y: "28%", x1: "20%", x2: "80%" },
-    { id: "chest", y: "35%", x1: "30%", x2: "70%" },
+    { id: "shoulders", y: "31%", x1: "20%", x2: "80%" },
+    { id: "chest", y: "38%", x1: "30%", x2: "70%" },
     { id: "waist", y: "50%", x1: "36%", x2: "64%" },
     { id: "hips", y: "57%", x1: "33%", x2: "67%" },
   ];
@@ -121,27 +121,27 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
               </g>
             );
           })}
-          {/* Arm measurement line (vertical) */}
+          {/* Arm measurement — horizontal across mid-bicep of right arm */}
           {(() => {
             const isArmActive = highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r";
             const armLabel = getMeasurementLabel("upper_arm_r");
             return (
               <g>
                 <line
-                  x1="76%"
-                  y1="32%"
-                  x2="76%"
-                  y2="44%"
+                  x1="73%"
+                  y1="38%"
+                  x2="81%"
+                  y2="38%"
                   stroke={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.35)"}
                   strokeWidth={isArmActive ? "0.4" : "0.25"}
                   strokeDasharray="1.5,1.5"
                 />
-                <circle cx="76" cy="32" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
-                <circle cx="76" cy="44" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
+                <circle cx="73" cy="38" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
+                <circle cx="81" cy="38" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
                 {isArmActive && armLabel && (
                   <>
-                    <rect x="78" y="36.8" width="10" height="4.4" rx="1" fill="#0a0a0a" stroke="#ffffff" strokeWidth="0.3" opacity="0.9" />
-                    <text x="83" y="39.8" fill="#ffffff" fontSize="3" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{armLabel}</text>
+                    <rect x="82.5" y="35.8" width="10" height="4.4" rx="1" fill="#0a0a0a" stroke="#ffffff" strokeWidth="0.3" opacity="0.9" />
+                    <text x="87.5" y="38.8" fill="#ffffff" fontSize="3" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{armLabel}</text>
                   </>
                 )}
               </g>
