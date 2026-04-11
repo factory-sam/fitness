@@ -30,3 +30,11 @@ Track weekly from Garmin scale. Append new entries, never delete.
 | Date | Weight (lbs) | Body Fat % | VO2 Max | Notes |
 |---|---|---|---|---|
 | 2026-04-11 | 212 | ~25% | 44 | Baseline |
+
+## Measurements Log
+
+Track monthly. All measurements in inches, relaxed.
+
+| Date | Shoulders | Chest | Waist | Hips | Arm (R) | S/W Ratio |
+|---|---|---|---|---|---|---|
+| 2026-04-11 | 45.75 | 43.25 | 39.5 | 43.0 | 13.0 | 1.158 |

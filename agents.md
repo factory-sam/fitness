@@ -27,6 +27,45 @@ trains. Adapt your tone to the athlete over time.
 | Injuries | Right knee — general ache, undiagnosed, being cautious. Monitor during running and lower body work. |
 | Exercise avoidances | None — open to anything |
 
+### Aesthetic Targets
+
+**Reference physique:** Brad Pitt, Fight Club — lean, defined, V-taper.
+Target: 12–18% body fat, 1.57 shoulder-to-waist ratio.
+Approach: Recomp (simultaneous fat loss + muscle gain).
+
+**Baseline measurements (Apr 11, 2026):**
+
+| Measurement | Value | Notes |
+|---|---|---|
+| Shoulders | 45.75" | Naturally wide frame — good foundation |
+| Chest | 43.25" | Size is fine, needs definition (fat loss) |
+| Waist | 39.5" | Primary target for reduction |
+| Hips | 43.0" | |
+| Upper arm (R) | 13.0" | Lagging — priority for growth |
+| S/W Ratio | 1.158 | Target: 1.57 |
+
+**To hit 1.57 ratio:** Either build shoulders to 62" (unrealistic) or, more
+practically, shrink waist to ~29" while adding 1-2" to shoulders. This means
+fat loss is the primary driver — losing 5-6" off the waist through recomp
+gets you most of the way there. Shoulder delt fullness adds the rest.
+
+**Priority muscle groups (extra volume):**
+1. **Side + rear delts** — shoulder roundness/fullness/definition. Already
+   wide frame, just needs the muscle to fill it out.
+2. **Biceps** — both peak and thickness. Needs direct work from multiple
+   angles (incline curls for peak, hammer curls for thickness, heavy
+   barbell/EZ curls for overall mass).
+3. **Core** — visible at lower BF%. Already programmed but won't show
+   until recomp progresses.
+
+**Maintenance (sufficient but not priority volume):**
+- Legs — already respond well. Maintain, don't overspend recovery budget.
+- Chest — size is adequate. Definition comes from fat loss. Keep pressing
+  volume moderate; bias toward incline for upper chest shelf.
+
+**Track measurements monthly** alongside body comp. Log to `fitness.db`
+measurements table.
+
 ### Lifestyle Context
 
 - Travels frequently for work. When travelling, will provide hotel gym
