@@ -298,21 +298,63 @@ export function ActiveWorkout({
                     </span>
 
                     {isHang ? (
-                      <button
-                        onClick={() =>
-                          setStopwatch({
-                            active: true,
-                            exercise: ex.exercise,
-                            setIdx: idx,
-                          })
-                        }
-                        disabled={s.done}
-                        className="font-mono text-xs px-3 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold transition-colors disabled:opacity-30"
-                      >
-                        {s.done && s.duration_sec
-                          ? `${s.duration_sec}s`
-                          : "Start Timer"}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          placeholder="sec"
+                          value={s.duration_sec ?? ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setExerciseSets((prev) => {
+                              const copy = { ...prev };
+                              copy[ex.exercise] = [...copy[ex.exercise]];
+                              copy[ex.exercise][idx] = {
+                                ...copy[ex.exercise][idx],
+                                duration_sec: val ? parseInt(val) : undefined,
+                              };
+                              return copy;
+                            });
+                          }}
+                          disabled={s.done}
+                          min="0"
+                          className="w-16 bg-bg-input border border-border rounded px-2 py-1.5 font-mono text-xs text-text focus:border-gold-dim focus:outline-none disabled:opacity-30"
+                        />
+                        <span className="type-micro text-text-muted">s</span>
+                        {!s.done && (
+                          <>
+                            <button
+                              onClick={() =>
+                                setStopwatch({
+                                  active: true,
+                                  exercise: ex.exercise,
+                                  setIdx: idx,
+                                })
+                              }
+                              className="font-mono text-xs px-2.5 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold-dim hover:text-gold transition-colors"
+                              title="Use stopwatch"
+                            >
+                              ⏱
+                            </button>
+                            <button
+                              onClick={() => {
+                                setExerciseSets((prev) => {
+                                  const copy = { ...prev };
+                                  copy[ex.exercise] = [...copy[ex.exercise]];
+                                  copy[ex.exercise][idx] = {
+                                    ...copy[ex.exercise][idx],
+                                    done: true,
+                                    duration_sec: copy[ex.exercise][idx].duration_sec || undefined,
+                                  };
+                                  return copy;
+                                });
+                              }}
+                              className="type-micro px-2 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold-dim hover:text-gold transition-colors"
+                            >
+                              ✓
+                            </button>
+                          </>
+                        )}
+                      </div>
                     ) : (
                       <>
                         <input
