@@ -2,13 +2,35 @@
 
 import { useState } from "react";
 
-interface VitruvianManProps {
-  onRegionClick?: (region: string) => void;
-  highlightedRegion?: string;
+interface Measurements {
+  shoulders?: number;
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  upper_arm_r?: number;
 }
 
-export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManProps) {
+interface VitruvianManProps {
+  onRegionClick?: (region: string) => void;
+  onRegionHover?: (region: string | null) => void;
+  highlightedRegion?: string;
+  measurements?: Measurements;
+}
+
+export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, measurements }: VitruvianManProps) {
   const [hovered, setHovered] = useState<string | null>(null);
+
+  const handleHover = (region: string | null) => {
+    setHovered(region);
+    onRegionHover?.(region);
+  };
+
+  const getMeasurementLabel = (id: string): string | null => {
+    if (!measurements) return null;
+    const val = measurements[id as keyof Measurements];
+    if (!val) return null;
+    return `${val}"`;
+  };
 
   const regions = [
     { id: "shoulders", label: "Shoulders", top: "24%", left: "18%", width: "64%", height: "7%" },
@@ -47,6 +69,7 @@ export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManP
         >
           {measurementLines.map((line) => {
             const isActive = highlightedRegion === line.id || hovered === line.id;
+            const label = getMeasurementLabel(line.id);
             return (
               <g key={line.id}>
                 <line
@@ -54,47 +77,76 @@ export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManP
                   y1={line.y}
                   x2={line.x2}
                   y2={line.y}
-                  stroke={isActive ? "#c9a84c" : "#8b7335"}
-                  strokeWidth="0.3"
+                  stroke={isActive ? "#ffffff" : "rgba(200, 210, 220, 0.35)"}
+                  strokeWidth={isActive ? "0.4" : "0.25"}
                   strokeDasharray="1.5,1.5"
-                  opacity={isActive ? 0.9 : 0.4}
                 />
                 <circle
                   cx={line.x1}
                   cy={line.y}
-                  r="0.6"
-                  fill={isActive ? "#c9a84c" : "#8b7335"}
-                  opacity={isActive ? 1 : 0.5}
+                  r={isActive ? "0.8" : "0.5"}
+                  fill={isActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"}
                 />
                 <circle
                   cx={line.x2}
                   cy={line.y}
-                  r="0.6"
-                  fill={isActive ? "#c9a84c" : "#8b7335"}
-                  opacity={isActive ? 1 : 0.5}
+                  r={isActive ? "0.8" : "0.5"}
+                  fill={isActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"}
                 />
+                {isActive && label && (
+                  <>
+                    <rect
+                      x={parseFloat(line.x2) + 1.5}
+                      y={parseFloat(line.y) - 2.2}
+                      width="10"
+                      height="4.4"
+                      rx="1"
+                      fill="#0a0a0a"
+                      stroke="#ffffff"
+                      strokeWidth="0.3"
+                      opacity="0.9"
+                    />
+                    <text
+                      x={parseFloat(line.x2) + 6.5}
+                      y={parseFloat(line.y) + 1}
+                      fill="#ffffff"
+                      fontSize="3"
+                      fontFamily="JetBrains Mono, monospace"
+                      textAnchor="middle"
+                    >
+                      {label}
+                    </text>
+                  </>
+                )}
               </g>
             );
           })}
-          {/* Arm measurement line (vertical-ish) */}
-          <line
-            x1="76%"
-            y1="32%"
-            x2="76%"
-            y2="44%"
-            stroke={
-              highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r"
-                ? "#c9a84c"
-                : "#8b7335"
-            }
-            strokeWidth="0.3"
-            strokeDasharray="1.5,1.5"
-            opacity={
-              highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r"
-                ? 0.9
-                : 0.4
-            }
-          />
+          {/* Arm measurement line (vertical) */}
+          {(() => {
+            const isArmActive = highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r";
+            const armLabel = getMeasurementLabel("upper_arm_r");
+            return (
+              <g>
+                <line
+                  x1="76%"
+                  y1="32%"
+                  x2="76%"
+                  y2="44%"
+                  stroke={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.35)"}
+                  strokeWidth={isArmActive ? "0.4" : "0.25"}
+                  strokeDasharray="1.5,1.5"
+                />
+                <circle cx="76" cy="32" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
+                <circle cx="76" cy="44" r={isArmActive ? 0.8 : 0.5} fill={isArmActive ? "#ffffff" : "rgba(200, 210, 220, 0.5)"} />
+                {isArmActive && armLabel && (
+                  <>
+                    <rect x="78" y="36.8" width="10" height="4.4" rx="1" fill="#0a0a0a" stroke="#ffffff" strokeWidth="0.3" opacity="0.9" />
+                    <text x="83" y="39.8" fill="#ffffff" fontSize="3" fontFamily="JetBrains Mono, monospace" textAnchor="middle">{armLabel}</text>
+                  </>
+                )}
+              </g>
+            );
+          })()}
         </svg>
 
         {/* Clickable regions */}
@@ -116,8 +168,8 @@ export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManP
                   ? "rgba(201, 168, 76, 0.3)"
                   : "transparent",
               }}
-              onMouseEnter={() => setHovered(region.id)}
-              onMouseLeave={() => setHovered(null)}
+              onMouseEnter={() => handleHover(region.id)}
+              onMouseLeave={() => handleHover(null)}
               onClick={() => onRegionClick?.(region.id)}
               title={region.label}
             />
