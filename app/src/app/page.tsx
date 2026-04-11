@@ -7,6 +7,8 @@ import {
   getPersonalRecords,
   getBodyCompHistory,
   getMeasurements,
+  getUntakenSupplementsToday,
+  getProgrammeDays,
 } from "../lib/queries";
 import { HeroStats } from "../components/dashboard/hero-stats";
 import { RecentSessions } from "../components/dashboard/recent-sessions";
@@ -26,15 +28,21 @@ export default function Dashboard() {
   const prs = getPersonalRecords() as Record<string, unknown>[];
   const bodyCompHistory = getBodyCompHistory() as Record<string, unknown>[];
   const measurementHistory = getMeasurements() as Record<string, unknown>[];
+  const untakenSupps = getUntakenSupplementsToday() as unknown[];
+  const programmeDays = getProgrammeDays() as { day_name: string; focus: string }[];
 
   const swRatio =
     measurements?.shoulders && measurements?.waist
       ? ((measurements.shoulders as number) / (measurements.waist as number)).toFixed(3)
       : null;
 
+  // Suggest next workout based on day of week or just first day
+  const nextWorkoutDay = programmeDays.length > 0 ? programmeDays[0].day_name : undefined;
+
   return (
-    <div className="p-6 pb-12 max-w-6xl mx-auto space-y-6">
-      <header className="flex items-baseline justify-between mb-2">
+    <div className="p-6 pb-12 max-w-6xl mx-auto">
+      {/* Header */}
+      <header className="flex items-baseline justify-between mb-8">
         <h1 className="font-serif text-2xl text-text">Dashboard</h1>
         <span className="font-mono text-xs text-text-muted">
           {new Date().toLocaleDateString("en-US", {
@@ -46,6 +54,7 @@ export default function Dashboard() {
         </span>
       </header>
 
+      {/* Hero: Goal progress + today + body metrics */}
       <HeroStats
         weight={bodyComp?.weight_lbs as number | undefined}
         bodyFat={bodyComp?.body_fat_pct as number | undefined}
@@ -53,15 +62,28 @@ export default function Dashboard() {
         swRatio={swRatio}
         streak={streak}
         totalSessions={allDates.length}
+        untakenSupplements={untakenSupps.length}
+        nextWorkoutDay={nextWorkoutDay}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <BodyCompChart history={bodyCompHistory} measurements={measurementHistory} />
+      {/* Divider */}
+      <div className="h-px bg-border my-8" />
+
+      {/* Main content: asymmetric 3-column layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left: Activity — consistency + recent sessions */}
+        <div className="lg:col-span-5 space-y-6">
+          <ConsistencyCalendar dates={allDates.map((d) => d.date)} />
           <RecentSessions sessions={recentSessions} />
         </div>
-        <div className="space-y-6">
-          <ConsistencyCalendar dates={allDates.map((d) => d.date)} />
+
+        {/* Center: Body trends — the chart */}
+        <div className="lg:col-span-4">
+          <BodyCompChart history={bodyCompHistory} measurements={measurementHistory} />
+        </div>
+
+        {/* Right: Goals — PRs + pull-up progression */}
+        <div className="lg:col-span-3 space-y-6">
           <PRBoard prs={prs} />
           <PullUpTimeline />
         </div>
