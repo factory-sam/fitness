@@ -5,7 +5,8 @@ import { useState } from "react";
 interface Supplement {
   id: number;
   name: string;
-  dosage: string | null;
+  amount: number | null;
+  units: string | null;
   time_of_day: string;
   frequency: string;
   active: number;
@@ -25,6 +26,23 @@ const FREQ_OPTIONS = [
   { value: "as-needed", label: "As Needed" },
 ];
 
+const UNIT_OPTIONS = [
+  { value: "g", label: "g" },
+  { value: "mg", label: "mg" },
+  { value: "mcg", label: "mcg" },
+  { value: "ml", label: "ml" },
+  { value: "oz", label: "oz" },
+  { value: "IU", label: "IU" },
+  { value: "caps", label: "caps" },
+  { value: "tabs", label: "tabs" },
+  { value: "scoops", label: "scoops" },
+];
+
+function formatDosage(amount: number | null, units: string | null): string {
+  if (amount == null) return "";
+  return units ? `${amount}${units}` : `${amount}`;
+}
+
 export function ManageStack({
   supplements,
   onAdd,
@@ -33,7 +51,8 @@ export function ManageStack({
   supplements: Supplement[];
   onAdd: (data: {
     name: string;
-    dosage: string;
+    amount: string;
+    units: string;
     time_of_day: string;
     frequency: string;
     notes: string;
@@ -45,14 +64,15 @@ export function ManageStack({
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
     name: "",
-    dosage: "",
+    amount: "",
+    units: "g",
     time_of_day: "morning",
     frequency: "daily",
     notes: "",
   });
 
   const resetForm = () => {
-    setForm({ name: "", dosage: "", time_of_day: "morning", frequency: "daily", notes: "" });
+    setForm({ name: "", amount: "", units: "g", time_of_day: "morning", frequency: "daily", notes: "" });
     setShowAddForm(false);
     setEditingId(null);
   };
@@ -60,7 +80,14 @@ export function ManageStack({
   const handleSubmit = () => {
     if (!form.name.trim()) return;
     if (editingId !== null) {
-      onUpdate(editingId, form);
+      onUpdate(editingId, {
+        name: form.name,
+        amount: form.amount ? parseFloat(form.amount) : null,
+        units: form.units || null,
+        time_of_day: form.time_of_day,
+        frequency: form.frequency,
+        notes: form.notes || null,
+      });
     } else {
       onAdd(form);
     }
@@ -70,7 +97,8 @@ export function ManageStack({
   const startEdit = (supp: Supplement) => {
     setForm({
       name: supp.name,
-      dosage: supp.dosage ?? "",
+      amount: supp.amount?.toString() ?? "",
+      units: supp.units ?? "g",
       time_of_day: supp.time_of_day,
       frequency: supp.frequency,
       notes: supp.notes ?? "",
@@ -94,7 +122,6 @@ export function ManageStack({
 
       {expanded && (
         <div className="mt-4 space-y-3">
-          {/* Supplement list */}
           {supplements.map((supp) => (
             <div
               key={supp.id}
@@ -108,9 +135,9 @@ export function ManageStack({
                 <span className="font-mono text-sm text-text">
                   {supp.name}
                 </span>
-                {supp.dosage && (
+                {(supp.amount != null) && (
                   <span className="font-mono text-xs text-text-muted ml-2">
-                    {supp.dosage}
+                    {formatDosage(supp.amount, supp.units)}
                   </span>
                 )}
                 <div className="font-mono text-[10px] text-text-muted mt-0.5">
@@ -137,7 +164,6 @@ export function ManageStack({
             </div>
           ))}
 
-          {/* Add/Edit form */}
           {showAddForm ? (
             <div className="border border-gold-dim rounded-md p-3 space-y-3 bg-bg-elevated/30">
               <p className="font-mono text-xs text-gold uppercase tracking-widest">
@@ -150,14 +176,27 @@ export function ManageStack({
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full bg-bg-input border border-border rounded-md px-3 py-2 font-mono text-sm text-text placeholder:text-text-muted focus:border-gold-dim focus:outline-none"
               />
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-4 gap-2">
                 <input
-                  type="text"
-                  placeholder="Dosage (e.g. 5g)"
-                  value={form.dosage}
-                  onChange={(e) => setForm({ ...form, dosage: e.target.value })}
+                  type="number"
+                  placeholder="Amount"
+                  value={form.amount}
+                  onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                  step="any"
+                  min="0"
                   className="bg-bg-input border border-border rounded-md px-3 py-2 font-mono text-sm text-text placeholder:text-text-muted focus:border-gold-dim focus:outline-none"
                 />
+                <select
+                  value={form.units}
+                  onChange={(e) => setForm({ ...form, units: e.target.value })}
+                  className="bg-bg-input border border-border rounded-md px-3 py-2 font-mono text-sm text-text focus:border-gold-dim focus:outline-none"
+                >
+                  {UNIT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
                 <select
                   value={form.time_of_day}
                   onChange={(e) => setForm({ ...form, time_of_day: e.target.value })}

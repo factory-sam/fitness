@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 interface UntakenSupplement {
   id: number;
   name: string;
-  dosage: string | null;
+  amount: number | null;
+  units: string | null;
 }
 
 export function SupplementReminder() {
@@ -72,7 +73,7 @@ export function SupplementReminder() {
             className="font-mono text-[10px] px-2 py-1 rounded border border-border-subtle bg-bg-elevated/50 text-text-secondary hover:border-gold-dim hover:text-gold transition-colors"
           >
             {s.name}
-            {s.dosage ? ` · ${s.dosage}` : ""}
+            {s.amount != null ? ` · ${s.amount}${s.units ?? ""}` : ""}
           </button>
         ))}
       </div>

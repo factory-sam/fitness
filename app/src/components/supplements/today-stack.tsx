@@ -5,7 +5,8 @@ import { useState } from "react";
 interface Supplement {
   id: number;
   name: string;
-  dosage: string | null;
+  amount: number | null;
+  units: string | null;
   time_of_day: string;
   frequency: string;
   notes: string | null;
@@ -119,9 +120,9 @@ export function TodayStack({
                   >
                     {supp.name}
                   </span>
-                  {supp.dosage && (
+                  {supp.amount != null && (
                     <span className="font-mono text-xs text-text-muted">
-                      {supp.dosage}
+                      {supp.amount}{supp.units ?? ""}
                     </span>
                   )}
                 </button>

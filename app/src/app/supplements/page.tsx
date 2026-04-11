@@ -8,7 +8,8 @@ import { ManageStack } from "../../components/supplements/manage-stack";
 interface Supplement {
   id: number;
   name: string;
-  dosage: string | null;
+  amount: number | null;
+  units: string | null;
   time_of_day: string;
   frequency: string;
   active: number;
@@ -80,7 +81,8 @@ export default function SupplementsPage() {
 
   const handleAdd = async (data: {
     name: string;
-    dosage: string;
+    amount: string;
+    units: string;
     time_of_day: string;
     frequency: string;
     notes: string;
@@ -88,7 +90,11 @@ export default function SupplementsPage() {
     await fetch("/api/supplements", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        amount: data.amount ? parseFloat(data.amount) : null,
+        units: data.units || null,
+      }),
     });
     fetchAll();
   };

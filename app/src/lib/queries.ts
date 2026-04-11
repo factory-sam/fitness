@@ -264,18 +264,20 @@ export function getAllSupplements() {
 
 export function createSupplement(data: {
   name: string;
-  dosage?: string;
+  amount?: number;
+  units?: string;
   time_of_day?: string;
   frequency?: string;
   notes?: string;
 }) {
   const db = getDb();
   const stmt = db.prepare(
-    "INSERT INTO supplements (name, dosage, time_of_day, frequency, notes) VALUES (?, ?, ?, ?, ?)"
+    "INSERT INTO supplements (name, amount, units, time_of_day, frequency, notes) VALUES (?, ?, ?, ?, ?, ?)"
   );
   return stmt.run(
     data.name,
-    data.dosage ?? null,
+    data.amount ?? null,
+    data.units ?? null,
     data.time_of_day ?? "any",
     data.frequency ?? "daily",
     data.notes ?? null
@@ -338,7 +340,7 @@ export function getSupplementLogForDate(date: string) {
   const db = getDb();
   return db
     .prepare(
-      `SELECT sl.*, s.name, s.dosage, s.time_of_day, s.frequency
+      `SELECT sl.*, s.name, s.amount, s.units, s.time_of_day, s.frequency
        FROM supplement_log sl
        JOIN supplements s ON sl.supplement_id = s.id
        WHERE sl.date = ?`
@@ -350,7 +352,7 @@ export function getSupplementLogRange(startDate: string, endDate: string) {
   const db = getDb();
   return db
     .prepare(
-      `SELECT sl.*, s.name, s.dosage, s.time_of_day
+      `SELECT sl.*, s.name, s.amount, s.units, s.time_of_day
        FROM supplement_log sl
        JOIN supplements s ON sl.supplement_id = s.id
        WHERE sl.date BETWEEN ? AND ?

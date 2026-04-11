@@ -11,7 +11,8 @@ export async function POST(request: Request) {
   const body = await request.json();
   const result = createSupplement({
     name: body.name,
-    dosage: body.dosage,
+    amount: body.amount,
+    units: body.units,
     time_of_day: body.time_of_day,
     frequency: body.frequency,
     notes: body.notes,

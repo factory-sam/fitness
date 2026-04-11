@@ -78,7 +78,8 @@ def init():
         CREATE TABLE IF NOT EXISTS supplements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
-            dosage TEXT,
+            amount REAL,
+            units TEXT,
             time_of_day TEXT DEFAULT 'any',
             frequency TEXT DEFAULT 'daily',
             active INTEGER DEFAULT 1,
