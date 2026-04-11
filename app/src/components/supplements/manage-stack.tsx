@@ -132,7 +132,7 @@ export function ManageStack({
               }`}
             >
               <div className="flex-1 min-w-0">
-                <span className="font-mono text-sm text-text">
+                <span className="font-mono text-sm text-text truncate block">
                   {supp.name}
                 </span>
                 {(supp.amount != null) && (
@@ -174,6 +174,8 @@ export function ManageStack({
                 placeholder="Name (e.g. Creatine Monohydrate)"
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
+                maxLength={80}
+                required
                 className="w-full bg-bg-input border border-border rounded-md px-3 py-2 font-mono text-sm text-text placeholder:text-text-muted focus:border-gold-dim focus:outline-none"
               />
               <div className="grid grid-cols-4 gap-2">

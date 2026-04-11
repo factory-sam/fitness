@@ -8,12 +8,14 @@ export function WorkoutSummary({
   notes,
   onSave,
   onDiscard,
+  saving = false,
 }: {
   dayName: string;
   sets: LoggedSet[];
   notes: string;
   onSave: () => void;
   onDiscard: () => void;
+  saving?: boolean;
 }) {
   const exercises = new Map<string, LoggedSet[]>();
   for (const s of sets) {
@@ -104,13 +106,15 @@ export function WorkoutSummary({
       <div className="flex gap-3">
         <button
           onClick={onSave}
-          className="flex-1 font-mono text-sm py-3 rounded bg-gold text-bg font-semibold hover:bg-gold-bright transition-colors"
+          disabled={saving}
+          className="flex-1 font-mono text-sm py-3 rounded bg-gold text-bg font-semibold hover:bg-gold-bright transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Save to Log
+          {saving ? "Saving..." : "Save to Log"}
         </button>
         <button
           onClick={onDiscard}
-          className="font-mono text-sm py-3 px-6 rounded border border-border text-text-secondary hover:border-error hover:text-error transition-colors"
+          disabled={saving}
+          className="font-mono text-sm py-3 px-6 rounded border border-border text-text-secondary hover:border-error hover:text-error transition-colors disabled:opacity-50"
         >
           Discard
         </button>

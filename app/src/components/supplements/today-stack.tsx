@@ -90,7 +90,7 @@ export function TodayStack({
                 <button
                   key={supp.id}
                   onClick={() => onToggle(supp.id, !taken)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-left group ${
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-left group min-w-0 ${
                     taken
                       ? "bg-gold-muted/30 border border-gold-dim/50"
                       : "bg-bg-elevated/50 border border-border-subtle hover:border-gold-dim/30"
@@ -114,7 +114,7 @@ export function TodayStack({
                     )}
                   </div>
                   <span
-                    className={`font-mono text-sm flex-1 ${
+                    className={`font-mono text-sm flex-1 truncate ${
                       taken ? "text-gold line-through opacity-60" : "text-text"
                     }`}
                   >

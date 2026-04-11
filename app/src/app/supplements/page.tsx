@@ -43,22 +43,35 @@ export default function SupplementsPage() {
     totalActive: 0,
     dailyCompliance: [],
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [togglingIds, setTogglingIds] = useState<Set<number>>(new Set());
 
   const today = new Date().toISOString().split("T")[0];
 
   const fetchAll = useCallback(async () => {
-    const [suppsRes, allSuppsRes, logRes, statsRes] = await Promise.all([
-      fetch("/api/supplements"),
-      fetch("/api/supplements?all=true"),
-      fetch(`/api/supplements/log?date=${today}`),
-      fetch("/api/supplements/stats?days=90"),
-    ]);
-    setSupplements(await suppsRes.json());
-    setAllSupplements(await allSuppsRes.json());
-    setTodayLog(await logRes.json());
-    const statsData = await statsRes.json();
-    setStreaks(statsData.streaks);
-    setCompliance(statsData.compliance);
+    try {
+      setError(null);
+      const [suppsRes, allSuppsRes, logRes, statsRes] = await Promise.all([
+        fetch("/api/supplements"),
+        fetch("/api/supplements?all=true"),
+        fetch(`/api/supplements/log?date=${today}`),
+        fetch("/api/supplements/stats?days=90"),
+      ]);
+      if (!suppsRes.ok || !allSuppsRes.ok || !logRes.ok || !statsRes.ok) {
+        throw new Error("Failed to load supplement data");
+      }
+      setSupplements(await suppsRes.json());
+      setAllSupplements(await allSuppsRes.json());
+      setTodayLog(await logRes.json());
+      const statsData = await statsRes.json();
+      setStreaks(statsData.streaks);
+      setCompliance(statsData.compliance);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   }, [today]);
 
   useEffect(() => {
@@ -66,17 +79,41 @@ export default function SupplementsPage() {
   }, [fetchAll]);
 
   const handleToggle = async (supplementId: number, taken: boolean) => {
-    await fetch("/api/supplements/log", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        supplement_id: supplementId,
-        date: today,
-        taken: taken ? 1 : 0,
-        time_taken: new Date().toTimeString().slice(0, 5),
-      }),
+    if (togglingIds.has(supplementId)) return;
+    // Optimistic update
+    setTogglingIds((prev) => new Set(prev).add(supplementId));
+    const prevLog = [...todayLog];
+    setTodayLog((prev) => {
+      const existing = prev.find((l) => l.supplement_id === supplementId);
+      if (existing) {
+        return prev.map((l) =>
+          l.supplement_id === supplementId ? { ...l, taken: taken ? 1 : 0 } : l
+        );
+      }
+      return [...prev, { supplement_id: supplementId, taken: taken ? 1 : 0, time_taken: null }];
     });
-    fetchAll();
+    try {
+      const res = await fetch("/api/supplements/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supplement_id: supplementId,
+          date: today,
+          taken: taken ? 1 : 0,
+          time_taken: new Date().toTimeString().slice(0, 5),
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to log");
+      fetchAll();
+    } catch {
+      setTodayLog(prevLog); // Rollback
+    } finally {
+      setTogglingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(supplementId);
+        return next;
+      });
+    }
   };
 
   const handleAdd = async (data: {
@@ -87,25 +124,35 @@ export default function SupplementsPage() {
     frequency: string;
     notes: string;
   }) => {
-    await fetch("/api/supplements", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...data,
-        amount: data.amount ? parseFloat(data.amount) : null,
-        units: data.units || null,
-      }),
-    });
-    fetchAll();
+    try {
+      const res = await fetch("/api/supplements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          amount: data.amount ? parseFloat(data.amount) : null,
+          units: data.units || null,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to add supplement");
+      fetchAll();
+    } catch {
+      setError("Failed to add supplement. Try again.");
+    }
   };
 
   const handleUpdate = async (id: number, data: Partial<Supplement>) => {
-    await fetch(`/api/supplements/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    fetchAll();
+    try {
+      const res = await fetch(`/api/supplements/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error("Failed to update");
+      fetchAll();
+    } catch {
+      setError("Failed to update supplement. Try again.");
+    }
   };
 
   return (
@@ -117,6 +164,24 @@ export default function SupplementsPage() {
         </p>
       </header>
 
+      {error && (
+        <div className="border border-error/50 rounded-md bg-error/10 px-4 py-3 flex items-center justify-between">
+          <span className="type-secondary text-error">{error}</span>
+          <button
+            onClick={() => { setError(null); fetchAll(); }}
+            className="type-micro text-text-secondary hover:text-gold transition-colors ml-4"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {loading ? (
+        <div className="card py-12 text-center">
+          <p className="type-secondary text-text-muted">Loading supplements...</p>
+        </div>
+      ) : (
+      <>
       <TodayStack
         supplements={supplements}
         todayLog={todayLog}
@@ -130,6 +195,8 @@ export default function SupplementsPage() {
         onAdd={handleAdd}
         onUpdate={handleUpdate}
       />
+      </>
+      )}
     </div>
   );
 }

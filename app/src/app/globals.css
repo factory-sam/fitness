@@ -286,6 +286,15 @@ body {
   transition: stroke-dashoffset 1s linear;
 }
 
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* RPE color coding */
 .rpe-low { color: var(--color-success); }
 .rpe-mid { color: var(--color-gold); }

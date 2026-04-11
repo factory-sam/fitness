@@ -69,6 +69,7 @@ export function ActiveWorkout({
     setIdx: number;
   } | null>(null);
   const [notes, setNotes] = useState("");
+  const [showFinishConfirm, setShowFinishConfirm] = useState(false);
 
   const updateSet = (
     exercise: string,
@@ -266,7 +267,7 @@ export function ActiveWorkout({
                         {ex.superset_group}
                       </span>
                     )}
-                    <span className="font-mono text-sm text-text font-medium">
+                    <span className="font-mono text-sm text-text font-medium truncate">
                       {ex.exercise}
                     </span>
                   </div>
@@ -391,6 +392,36 @@ export function ActiveWorkout({
         })}
       </div>
 
+      {/* Finish confirmation */}
+      {showFinishConfirm && (
+        <div className="fixed inset-0 bg-bg/90 z-50 flex items-center justify-center">
+          <div className="card max-w-sm w-full mx-4 space-y-4">
+            <h3 className="section-heading">Finish workout?</h3>
+            <p className="type-secondary text-text-secondary">
+              {doneSets}/{totalSets} sets completed.
+              {doneSets < totalSets && ` ${totalSets - doneSets} sets will not be logged.`}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowFinishConfirm(false);
+                  handleFinish();
+                }}
+                className="flex-1 font-mono text-sm py-2.5 rounded bg-gold text-bg font-semibold hover:bg-gold-bright transition-colors"
+              >
+                Finish
+              </button>
+              <button
+                onClick={() => setShowFinishConfirm(false)}
+                className="px-4 font-mono text-sm py-2.5 rounded border border-border text-text-secondary hover:border-gold-dim transition-colors"
+              >
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Session notes + finish */}
       <div className="mt-6 space-y-3">
         <textarea
@@ -400,7 +431,7 @@ export function ActiveWorkout({
           className="w-full bg-bg-input border border-border rounded px-3 py-2 font-mono text-xs text-text focus:border-gold-dim focus:outline-none resize-none h-20"
         />
         <button
-          onClick={handleFinish}
+          onClick={() => setShowFinishConfirm(true)}
           className="w-full font-mono text-sm py-3 rounded bg-gold text-bg font-semibold hover:bg-gold-bright transition-colors"
         >
           Finish Workout →
