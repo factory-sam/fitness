@@ -68,17 +68,17 @@ export function ExerciseList({
                   <td className="text-text-muted">{logged?.last_date ?? "—"}</td>
                   <td>
                     {inProgramme && (
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-gold-muted text-gold">
+                      <span className="type-micro px-1.5 py-0.5 rounded bg-gold-muted text-gold">
                         ACTIVE
                       </span>
                     )}
                     {!inProgramme && logged && (
-                      <span className="font-mono text-[9px] px-1.5 py-0.5 rounded bg-bg-elevated text-text-muted">
+                      <span className="type-micro px-1.5 py-0.5 rounded bg-bg-elevated text-text-muted">
                         LOGGED
                       </span>
                     )}
                     {!inProgramme && !logged && (
-                      <span className="font-mono text-[9px] text-text-muted">
+                      <span className="type-micro text-text-muted">
                         —
                       </span>
                     )}

@@ -56,7 +56,7 @@ export function PullUpTimeline() {
               >
                 {m.label}
               </p>
-              <p className="font-mono text-[10px] text-text-muted">
+              <p className="type-micro text-text-muted">
                 {m.detail}
               </p>
             </div>

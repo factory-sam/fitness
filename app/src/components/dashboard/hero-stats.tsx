@@ -82,15 +82,15 @@ export function HeroStats({
         <div className="flex items-center gap-6 flex-1">
           <ProgressArc ratio={ratioNum} target={1.57} />
           <div>
-            <p className="font-mono text-[10px] text-text-muted uppercase tracking-widest">
+            <p className="type-label text-text-muted">
               Shoulder-to-Waist
             </p>
-            <p className="font-serif text-lg text-text mt-0.5">
+            <p className="font-serif text-lg text-text mt-1">
               {ratioNum > 0
                 ? `${((1.57 - ratioNum) / (1.57 - 1.0) * 100).toFixed(0)}% to go`
                 : "No measurements yet"}
             </p>
-            <p className="font-mono text-[10px] text-text-muted mt-1">
+            <p className="type-micro text-text-muted mt-1">
               Primary driver: waist reduction through recomp
             </p>
           </div>
@@ -98,7 +98,7 @@ export function HeroStats({
 
         {/* Today's action card */}
         <div className="flex-1 border border-border rounded-lg px-5 py-4 bg-bg-card">
-          <p className="font-mono text-[10px] text-gold uppercase tracking-widest mb-3">
+          <p className="type-label text-gold mb-3">
             Today
           </p>
           <div className="space-y-2.5">
@@ -107,10 +107,10 @@ export function HeroStats({
                 href="/workout"
                 className="flex items-center gap-3 group"
               >
-                <span className="w-5 h-5 rounded bg-gold-muted/50 flex items-center justify-center text-gold text-[10px] group-hover:bg-gold group-hover:text-bg transition-colors">
+                <span className="w-5 h-5 rounded bg-gold-muted/50 flex items-center justify-center text-gold type-micro group-hover:bg-gold group-hover:text-bg transition-colors">
                   ▶
                 </span>
-                <span className="font-mono text-sm text-text group-hover:text-gold transition-colors">
+                <span className="type-secondary text-text group-hover:text-gold transition-colors">
                   {nextWorkoutDay}
                 </span>
               </Link>
@@ -120,10 +120,10 @@ export function HeroStats({
                 href="/workout"
                 className="flex items-center gap-3 group"
               >
-                <span className="w-5 h-5 rounded bg-gold-muted/50 flex items-center justify-center text-gold text-[10px] group-hover:bg-gold group-hover:text-bg transition-colors">
+                <span className="w-5 h-5 rounded bg-gold-muted/50 flex items-center justify-center text-gold type-micro group-hover:bg-gold group-hover:text-bg transition-colors">
                   ▶
                 </span>
-                <span className="font-mono text-sm text-text group-hover:text-gold transition-colors">
+                <span className="type-secondary text-text group-hover:text-gold transition-colors">
                   Start your first workout
                 </span>
               </Link>
@@ -133,20 +133,20 @@ export function HeroStats({
                 href="/supplements"
                 className="flex items-center gap-3 group"
               >
-                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-text-muted text-[10px] group-hover:text-gold transition-colors">
+                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-text-muted type-micro group-hover:text-gold transition-colors">
                   +
                 </span>
-                <span className="font-mono text-sm text-text-secondary group-hover:text-gold transition-colors">
+                <span className="type-secondary text-text-secondary group-hover:text-gold transition-colors">
                   {untakenSupplements} supplement{untakenSupplements !== 1 ? "s" : ""} remaining
                 </span>
               </Link>
             )}
             {streak > 0 && (
               <div className="flex items-center gap-3">
-                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-gold text-[10px]">
+                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-gold type-micro">
                   {streak}
                 </span>
-                <span className="font-mono text-xs text-text-muted">
+                <span className="type-caption text-text-muted">
                   session streak
                 </span>
               </div>
@@ -182,17 +182,17 @@ function MetricInline({
 }) {
   return (
     <div className="flex items-baseline gap-2">
-      <span className="font-mono text-[10px] text-text-muted uppercase tracking-wider">
+      <span className="type-label text-text-muted">
         {label}
       </span>
-      <span className="font-mono text-sm font-semibold text-text">
+      <span className="type-data text-text">
         {value}
       </span>
       {unit && (
-        <span className="font-mono text-[10px] text-text-muted">{unit}</span>
+        <span className="type-micro text-text-muted">{unit}</span>
       )}
       {target && (
-        <span className="font-mono text-[10px] text-gold-dim">({target})</span>
+        <span className="type-micro text-gold-dim">({target})</span>
       )}
     </div>
   );

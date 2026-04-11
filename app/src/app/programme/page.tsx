@@ -49,7 +49,7 @@ export default function ProgrammePage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6 pb-12">
       <header>
-        <h1 className="font-serif text-2xl text-text">Programme</h1>
+        <h1 className="type-heading text-text">Programme</h1>
         <p className="font-mono text-xs text-text-muted mt-1">
           RECOMP I — 12 Weeks — Upper/Lower 4×/week
         </p>
@@ -71,11 +71,11 @@ export default function ProgrammePage() {
             >
               {block.name}
             </p>
-            <p className="font-mono text-[10px] text-text-muted">
+            <p className="type-micro text-text-muted">
               Weeks {block.weeks}
             </p>
             {block.status === "active" && (
-              <span className="inline-block mt-1 font-mono text-[9px] px-1.5 py-0.5 rounded bg-gold-muted text-gold">
+              <span className="inline-block mt-1 type-micro px-1.5 py-0.5 rounded bg-gold-muted text-gold">
                 CURRENT
               </span>
             )}
@@ -100,7 +100,7 @@ export default function ProgrammePage() {
                   <h3 className="font-mono text-sm text-text font-medium">
                     {day.day_name}
                   </h3>
-                  <p className="font-mono text-[10px] text-text-muted">
+                  <p className="type-micro text-text-muted">
                     {day.focus}
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export default function ProgrammePage() {
                     <tr>
                       <td
                         colSpan={5}
-                        className="text-[10px] text-text-muted uppercase tracking-wider pt-2"
+                        className="type-label text-text-muted pt-2"
                       >
                         Warm-Up
                       </td>
@@ -140,7 +140,7 @@ export default function ProgrammePage() {
                     <tr>
                       <td
                         colSpan={5}
-                        className="text-[10px] text-text-muted uppercase tracking-wider pt-2"
+                        className="type-label text-text-muted pt-2"
                       >
                         Working Sets
                       </td>
@@ -150,7 +150,7 @@ export default function ProgrammePage() {
                     <tr key={ex.id}>
                       <td>
                         {ex.superset_group && (
-                          <span className="font-mono text-[9px] px-1 py-0.5 rounded bg-gold-muted text-gold">
+                          <span className="type-micro px-1 py-0.5 rounded bg-gold-muted text-gold">
                             {ex.superset_group}
                           </span>
                         )}

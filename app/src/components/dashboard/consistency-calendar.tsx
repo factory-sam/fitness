@@ -51,7 +51,7 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
           </div>
         ))}
       </div>
-      <p className="font-mono text-[10px] text-text-muted mt-2">
+      <p className="type-micro text-text-muted mt-2">
         Last 12 weeks · Gold = workout day
       </p>
     </div>

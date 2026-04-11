@@ -140,20 +140,20 @@ export function ManageStack({
                     {formatDosage(supp.amount, supp.units)}
                   </span>
                 )}
-                <div className="font-mono text-[10px] text-text-muted mt-0.5">
+                <div className="type-micro text-text-muted mt-0.5">
                   {TIME_OPTIONS.find((t) => t.value === supp.time_of_day)?.label} ·{" "}
                   {FREQ_OPTIONS.find((f) => f.value === supp.frequency)?.label}
                 </div>
               </div>
               <button
                 onClick={() => startEdit(supp)}
-                className="font-mono text-[10px] text-text-muted hover:text-gold transition-colors px-2 py-1"
+                className="type-micro text-text-muted hover:text-gold transition-colors px-2 py-1"
               >
                 EDIT
               </button>
               <button
                 onClick={() => onUpdate(supp.id, { active: supp.active ? 0 : 1 })}
-                className={`font-mono text-[10px] px-2 py-1 transition-colors ${
+                className={`type-micro px-2 py-1 transition-colors ${
                   supp.active
                     ? "text-text-muted hover:text-error"
                     : "text-success hover:text-gold"

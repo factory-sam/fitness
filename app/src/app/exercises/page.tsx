@@ -38,7 +38,7 @@ export default function ExercisesPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6 pb-12">
       <header>
-        <h1 className="font-serif text-2xl text-text">Exercise Library</h1>
+        <h1 className="type-heading text-text">Exercise Library</h1>
         <p className="font-mono text-xs text-text-muted mt-1">
           All exercises in your programme with logged history
         </p>

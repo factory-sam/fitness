@@ -43,7 +43,7 @@ export default function Dashboard() {
     <div className="p-6 pb-12 max-w-6xl mx-auto">
       {/* Header */}
       <header className="flex items-baseline justify-between mb-8">
-        <h1 className="font-serif text-2xl text-text">Dashboard</h1>
+        <h1 className="type-heading text-text">Dashboard</h1>
         <span className="font-mono text-xs text-text-muted">
           {new Date().toLocaleDateString("en-US", {
             weekday: "long",

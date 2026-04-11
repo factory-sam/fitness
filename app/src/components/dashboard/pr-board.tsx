@@ -37,7 +37,7 @@ export function PRBoard({ prs }: { prs: PR[] }) {
               <span className="font-mono text-sm font-semibold text-gold">
                 {pr.max_weight}
               </span>
-              <span className="font-mono text-[10px] text-text-muted">
+              <span className="type-micro text-text-muted">
                 {pr.weight_unit}
               </span>
             </div>

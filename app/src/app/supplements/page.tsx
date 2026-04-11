@@ -111,7 +111,7 @@ export default function SupplementsPage() {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6 pb-12">
       <header>
-        <h1 className="font-serif text-2xl text-text">Supplements</h1>
+        <h1 className="type-heading text-text">Supplements</h1>
         <p className="font-mono text-xs text-text-muted mt-1">
           Daily supplement tracking & compliance
         </p>

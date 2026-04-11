@@ -87,11 +87,11 @@ export function ComplianceChart({
                 <span className="font-mono text-lg text-gold font-semibold">
                   {s.streak}
                 </span>
-                <span className="font-mono text-[10px] text-text-muted">
+                <span className="type-micro text-text-muted">
                   day{s.streak !== 1 ? "s" : ""}
                 </span>
               </div>
-              <p className="font-mono text-[10px] text-text-muted mt-0.5">
+              <p className="type-micro text-text-muted mt-0.5">
                 best: {s.longest}
               </p>
             </div>
@@ -101,7 +101,7 @@ export function ComplianceChart({
 
       {/* Weekly compliance bar chart */}
       <div>
-        <p className="font-mono text-[10px] text-text-muted uppercase tracking-widest mb-2">
+        <p className="type-label text-text-muted mb-2">
           This Week
         </p>
         <div className="flex items-end gap-1 h-16">
@@ -129,7 +129,7 @@ export function ComplianceChart({
                     />
                   )}
                 </div>
-                <span className="font-mono text-[9px] text-text-muted">
+                <span className="type-micro text-text-muted">
                   {DAY_LABELS[i]}
                 </span>
               </div>
@@ -140,7 +140,7 @@ export function ComplianceChart({
 
       {/* Heatmap */}
       <div>
-        <p className="font-mono text-[10px] text-text-muted uppercase tracking-widest mb-2">
+        <p className="type-label text-text-muted mb-2">
           12-Week Adherence
         </p>
         <div className="flex gap-[3px]">
@@ -175,7 +175,7 @@ export function ComplianceChart({
           ))}
         </div>
         <div className="flex items-center gap-1 mt-2">
-          <span className="font-mono text-[9px] text-text-muted">Less</span>
+          <span className="type-micro text-text-muted">Less</span>
           {["#1a1508", "#2d2410", "#4a3d1a", "var(--color-gold-dim)", "var(--color-gold)"].map(
             (bg, i) => (
               <div
@@ -185,7 +185,7 @@ export function ComplianceChart({
               />
             )
           )}
-          <span className="font-mono text-[9px] text-text-muted">More</span>
+          <span className="type-micro text-text-muted">More</span>
         </div>
       </div>
     </div>

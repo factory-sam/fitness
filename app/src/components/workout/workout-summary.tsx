@@ -28,7 +28,7 @@ export function WorkoutSummary({
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="font-serif text-2xl text-text mb-1">Session Complete</h1>
+      <h1 className="type-heading text-text mb-1">Session Complete</h1>
       <p className="font-mono text-xs text-text-muted mb-6">{dayName}</p>
 
       <div className="grid grid-cols-3 gap-3 mb-6">
@@ -46,7 +46,7 @@ export function WorkoutSummary({
             {totalVolume > 0 ? totalVolume.toLocaleString() : "—"}
           </p>
           {totalVolume > 0 && (
-            <p className="font-mono text-[10px] text-text-muted">lbs</p>
+            <p className="type-micro text-text-muted">lbs</p>
           )}
         </div>
       </div>

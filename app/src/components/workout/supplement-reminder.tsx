@@ -60,7 +60,7 @@ export function SupplementReminder() {
         </span>
         <button
           onClick={() => setDismissed(true)}
-          className="font-mono text-[10px] text-text-muted hover:text-text"
+          className="type-micro text-text-muted hover:text-text"
         >
           ✕
         </button>
@@ -70,7 +70,7 @@ export function SupplementReminder() {
           <button
             key={s.id}
             onClick={() => handleQuickTake(s.id)}
-            className="font-mono text-[10px] px-2 py-1 rounded border border-border-subtle bg-bg-elevated/50 text-text-secondary hover:border-gold-dim hover:text-gold transition-colors"
+            className="type-micro px-2 py-1 rounded border border-border-subtle bg-bg-elevated/50 text-text-secondary hover:border-gold-dim hover:text-gold transition-colors"
           >
             {s.name}
             {s.amount != null ? ` · ${s.amount}${s.units ?? ""}` : ""}

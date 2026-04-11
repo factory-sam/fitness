@@ -93,7 +93,7 @@ export function MeasurementDisplay({
         </tbody>
       </table>
 
-      <p className="font-mono text-[10px] text-text-muted mt-3">
+      <p className="type-micro text-text-muted mt-3">
         Self-measured. Trend over time matters more than absolute values.
       </p>
     </div>

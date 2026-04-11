@@ -26,7 +26,7 @@ export default function BodyPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6 pb-12">
       <header>
-        <h1 className="font-serif text-2xl text-text">Body & Measurements</h1>
+        <h1 className="type-heading text-text">Body & Measurements</h1>
         <p className="font-mono text-xs text-text-muted mt-1">
           Track composition and measurements monthly
         </p>
@@ -39,19 +39,19 @@ export default function BodyPage() {
           <p className="metric-value text-xl">
             {(latestComp?.weight_lbs as number) ?? "—"}
           </p>
-          <p className="font-mono text-[10px] text-text-muted">lbs</p>
+          <p className="type-micro text-text-muted">lbs</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">Body Fat</p>
           <p className="metric-value text-xl">
             {(latestComp?.body_fat_pct as number) ?? "—"}%
           </p>
-          <p className="font-mono text-[10px] text-text-muted">target: 12–18%</p>
+          <p className="type-micro text-text-muted">target: 12-18%</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">S/W Ratio</p>
           <p className="metric-value text-xl">{swRatio ?? "—"}</p>
-          <p className="font-mono text-[10px] text-text-muted">target: 1.57</p>
+          <p className="type-micro text-text-muted">target: 1.57</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">VO₂ Max</p>

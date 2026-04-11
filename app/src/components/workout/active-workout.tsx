@@ -157,7 +157,7 @@ export function ActiveWorkout({
           <span className="font-mono text-sm text-gold">
             {doneSets}/{totalSets}
           </span>
-          <p className="font-mono text-[10px] text-text-muted">sets done</p>
+          <p className="type-micro text-text-muted">sets done</p>
         </div>
       </header>
 
@@ -235,12 +235,12 @@ export function ActiveWorkout({
                   >
                     {ex.exercise}
                   </span>
-                  <span className="font-mono text-[10px] text-text-muted ml-2">
+                  <span className="type-micro text-text-muted ml-2">
                     {ex.reps}
                   </span>
                 </div>
                 {ex.notes && (
-                  <span className="font-mono text-[10px] text-text-muted">
+                  <span className="type-micro text-text-muted">
                     {ex.notes}
                   </span>
                 )}
@@ -262,7 +262,7 @@ export function ActiveWorkout({
                 <div>
                   <div className="flex items-center gap-2">
                     {ex.superset_group && (
-                      <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-gold-muted text-gold">
+                      <span className="type-micro px-1.5 py-0.5 rounded bg-gold-muted text-gold">
                         {ex.superset_group}
                       </span>
                     )}
@@ -271,13 +271,13 @@ export function ActiveWorkout({
                     </span>
                   </div>
                   {ex.notes && (
-                    <p className="font-mono text-[10px] text-text-muted mt-0.5">
+                    <p className="type-micro text-text-muted mt-0.5">
                       {ex.notes}
                     </p>
                   )}
                 </div>
                 <div className="text-right">
-                  <span className="font-mono text-[10px] text-text-muted">
+                  <span className="type-micro text-text-muted">
                     {ex.sets}×{ex.reps}
                     {ex.target_rpe ? ` @ RPE ${ex.target_rpe}` : ""}
                   </span>
@@ -292,7 +292,7 @@ export function ActiveWorkout({
                       s.done ? "opacity-50" : ""
                     }`}
                   >
-                    <span className="font-mono text-[10px] text-text-muted w-6">
+                    <span className="type-micro text-text-muted w-6">
                       {idx + 1}
                     </span>
 
@@ -372,14 +372,14 @@ export function ActiveWorkout({
                             ex.rest_seconds ?? 60
                           )
                         }
-                        className="font-mono text-[10px] px-2 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold-dim hover:text-gold transition-colors"
+                        className="type-micro px-2 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold-dim hover:text-gold transition-colors"
                       >
                         ✓
                       </button>
                     )}
 
                     {s.done && (
-                      <span className="font-mono text-[10px] text-success">
+                      <span className="type-micro text-success">
                         ✓
                       </span>
                     )}

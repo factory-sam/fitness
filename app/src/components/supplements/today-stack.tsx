@@ -78,7 +78,7 @@ export function TodayStack({
         <div key={group.time}>
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border-subtle" />
-            <span className="font-mono text-[10px] text-text-muted tracking-widest">
+            <span className="type-label text-text-muted">
               {group.label}
             </span>
             <div className="h-px flex-1 bg-border-subtle" />

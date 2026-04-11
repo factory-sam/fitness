@@ -24,7 +24,7 @@ export function WorkoutSelector({
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="font-serif text-2xl text-text mb-2">Start Workout</h1>
+      <h1 className="type-heading text-text mb-2">Start Workout</h1>
       <p className="font-mono text-xs text-text-muted mb-6">
         Select today&apos;s session from your programme
       </p>
