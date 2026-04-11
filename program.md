@@ -77,24 +77,25 @@ Default tempo: compounds 2-1-1, accessories 3-1-1
 | W1 | Rower or Bike | 5 min | — | Easy pace, get blood moving. |
 | W2 | Shoulder Dislocates (band) | 2 x 15 | — | Slow, full ROM. |
 | W3 | Cat-Cow / Thoracic Ext | 2 x 10 | — | Open up the upper back. |
-| W4 | Scapular Pull-Ups | 2 x 8 | BW | Dead hang → retract/depress scapulae. Pull-up activation. |
 
 **Working Sets**
 
-Superset pairings shown as A1/A2, etc. Rest 60–90s between pairs.
+Superset pairings (A1/A2 etc.) only use same or adjacent equipment.
+Rest 60–90s between pairs. If gym is busy, drop to straight sets.
 
 | # | Exercise | Sets x Reps | Weight | RPE | Rest | Notes |
 |---|---|---|---|---|---|---|
 | — | *Lat Pulldown ramp* | 1x12, 1x8, 1x5 | 30, 50, 65 lbs | — | — | Warm-up ramp for first compound. |
-| A1 | Lat Pulldown (wide grip) | 4 x 12 | 80 lbs* | 6–7 | 60s | *Calibrate. Pull-up foundation — full ROM, 2 sec squeeze at bottom. |
-| A2 | DB Incline Bench Press | 4 x 10 | 30 lbs/arm | 6–7 | 90s | Antagonist superset. Controlled descent, full stretch. |
-| — | *Bench ramp* | 1x8, 1x5 | 45, 65 lbs | — | — | Ramp for second compound. |
-| B1 | Barbell Bench Press | 3 x 10 | 85 lbs* | 6–7 | 90s | *Calibrate. Solo — heavy compound, find your groove. |
-| C1 | Straight Arm Pulldown | 3 x 12 | 40 lbs* | 6–7 | 30s | *Calibrate. Arms straight, squeeze at hips. |
-| C2 | Face Pull (cable) | 3 x 15 | 30 lbs* | 6–7 | 60s | *Calibrate. High pull, external rotate at top. |
-| D1 | Dead Hang | 3 x max hold | BW | — | 30s | Log your times. Grip is still fresh before curls. |
-| D2 | Lateral Raise (DB) | 3 x 12 | 15 lbs/arm | 7 | 60s | No swinging. Controlled tempo. |
-| E1 | Hammer Curl | 3 x 10 | 30 lbs/arm | 6–7 | 60s | Arms last — grip fatigue doesn't matter here. |
+| A1 | Lat Pulldown (wide grip) | 4 x 12 | 80 lbs* | 6–7 | 90s | *Calibrate. Pull-up foundation — full ROM, 2 sec squeeze at bottom. Solo — dedicated machine. |
+| — | *Incline bench ramp* | 1x8, 1x5 | 15, 25 lbs/arm | — | — | Ramp for pressing. |
+| B1 | DB Incline Bench Press | 4 x 10 | 30 lbs/arm | 6–7 | 90s | Grab a bench + DBs. Controlled descent, full stretch. |
+| C1 | Straight Arm Pulldown | 3 x 12 | 40 lbs* | 6–7 | 30s | *Calibrate. Cable stack — swap attachment between C1/C2. |
+| C2 | Face Pull (cable) | 3 x 15 | 30 lbs* | 6–7 | 30s | *Calibrate. Same cable stack, rope attachment. |
+| C3 | Cable Fly | 3 x 12 | calibrate* | 7 | 60s | *Calibrate. Same cable crossover station. Chest definition. |
+| D1 | Dead Hang | 3 x max hold | BW | — | 30s | Pull-up bar. Log your times. |
+| D2 | Lateral Raise (DB) | 4 x 12 | 15 lbs/arm | 7 | 60s | Grab DBs near the bar. Priority muscle group. |
+| E1 | Hammer Curl | 3 x 10 | 30 lbs/arm | 6–7 | 30s | Same DBs for both curl variations. |
+| E2 | Incline Dumbbell Curl | 2 x 10 | calibrate* | 7 | 60s | *Calibrate. Same bench from B1 if free — or any adjustable bench. |
 
 **Exercises marked * need calibration.** If the first set is too easy (RPE 5 or below) or too hard (RPE 8+), adjust by 10 lbs and note the final weight in your log.
 

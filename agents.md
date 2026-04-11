@@ -66,6 +66,13 @@ gets you most of the way there. Shoulder delt fullness adds the rest.
 **Track measurements monthly** alongside body comp. Log to `fitness.db`
 measurements table.
 
+**Measurement accuracy note:** Baseline measurements (Apr 11, 2026) are
+self-measured, first attempt, no assistance. Treat as approximate —
+the absolute numbers may have +-1" error. What matters is the **trend
+over time** using consistent technique, not the starting values. Don't
+make programming decisions based on a single measurement delta. Look
+for patterns across 3+ data points before drawing conclusions.
+
 ### Lifestyle Context
 
 - Travels frequently for work. When travelling, will provide hotel gym
@@ -221,6 +228,15 @@ with diminishing returns.
   accumulated fatigue, consider early deload
 - Use Garmin data as a signal, not a hard rule — athlete feel takes priority
 
+### Superset Rules (Commercial Gym Etiquette)
+- Only superset exercises that share the same station or adjacent equipment
+  (e.g., cable fly + face pull on the same cable stack, lateral raise +
+  curls with the same dumbbells)
+- Never pair exercises that require hogging two separate machines/stations
+  across the gym floor (e.g., lat pulldown + incline bench)
+- If the gym is busy, drop to straight sets — don't be that guy
+- Good pairings: same cable stack, same bench + DBs, bodyweight + anything nearby
+
 ### Training Preferences
 
 - Recent history: full body split
@@ -242,6 +258,12 @@ with diminishing returns.
 | `fitness.db` | **Source of truth.** SQLite database — all sessions, sets, working weights, body comp, milestones. |
 | `fitness_log.py` | Helper script for logging and querying the database. |
 | `init_db.py` | Database schema initialisation (run once). |
+
+### MCP Integrations
+- **Next.js MCP** — Dev server diagnostics, route inspection, error detection
+  for the fitness web app at `app/`. Auto-discovered on port 3000.
+- **Playwright MCP** — Browser automation for testing the web app, taking
+  screenshots, and verifying UI changes during development.
 
 ### Data Rules
 - **Always log sessions to `fitness.db` first** using `fitness_log.py`.

@@ -1,5 +1,11 @@
 *.db
+*.db-shm
+*.db-wal
 __pycache__/
 *.pyc
 .env
 .DS_Store
+.playwright-mcp/
+app/node_modules/
+app/.next/
+app/.turbo/

@@ -1,0 +1,194 @@
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #0a0a0a;
+  --color-bg-card: #111111;
+  --color-bg-elevated: #1a1a1a;
+  --color-bg-input: #0f0f0f;
+  --color-border: #2a2a2a;
+  --color-border-subtle: #1e1e1e;
+  --color-gold: #c9a84c;
+  --color-gold-dim: #8b7335;
+  --color-gold-bright: #e8c84a;
+  --color-gold-muted: #5a4d2a;
+  --color-text: #e0ddd5;
+  --color-text-secondary: #8a8580;
+  --color-text-muted: #5a5650;
+  --color-success: #4a9e6e;
+  --color-warning: #c9a84c;
+  --color-error: #c25454;
+  --color-info: #5a8ec9;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-serif: "Playfair Display", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Box-drawing borders — TUI aesthetic */
+.tui-border {
+  border: 1px solid var(--color-border);
+  box-shadow: inset 0 0 0 1px var(--color-border-subtle);
+}
+
+.tui-border-gold {
+  border: 1px solid var(--color-gold-dim);
+  box-shadow: inset 0 0 0 1px var(--color-gold-muted);
+}
+
+/* Card component */
+.card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  transition: border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--color-gold-dim);
+}
+
+/* Metric big number */
+.metric-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-gold);
+}
+
+.metric-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-secondary);
+}
+
+/* Section headers — serif */
+.section-heading {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1.25rem;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+}
+
+/* Data tables — Tufte-inspired */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.data-table thead {
+  border-bottom: 2px solid var(--color-gold-dim);
+}
+
+.data-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+}
+
+.data-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.data-table tr:hover td {
+  background-color: var(--color-bg-elevated);
+}
+
+/* Terminal-style status bar */
+.status-bar {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  background-color: var(--color-bg-elevated);
+  border-top: 1px solid var(--color-border);
+  padding: 0.375rem 1rem;
+  color: var(--color-text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Blinking cursor for active elements */
+.cursor-blink::after {
+  content: "▊";
+  animation: blink 1s step-end infinite;
+  color: var(--color-gold);
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Gold gradient for heatmaps */
+.gold-gradient-1 { background-color: #1a1508; }
+.gold-gradient-2 { background-color: #2d2410; }
+.gold-gradient-3 { background-color: #4a3d1a; }
+.gold-gradient-4 { background-color: #6b5a25; }
+.gold-gradient-5 { background-color: #8b7335; }
+.gold-gradient-6 { background-color: #c9a84c; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-dim);
+}
+
+/* Nav link */
+.nav-link {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  text-decoration: none;
+}
+.nav-link:hover {
+  color: var(--color-gold);
+  background-color: var(--color-bg-elevated);
+}
+.nav-link.active {
+  color: var(--color-gold);
+  background-color: var(--color-gold-muted);
+}
+
+/* Rest timer ring */
+.timer-ring {
+  stroke: var(--color-gold);
+  fill: none;
+  stroke-width: 4;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+
+/* RPE color coding */
+.rpe-low { color: var(--color-success); }
+.rpe-mid { color: var(--color-gold); }
+.rpe-high { color: var(--color-error); }
