@@ -11,18 +11,18 @@ export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManP
   const [hovered, setHovered] = useState<string | null>(null);
 
   const regions = [
-    { id: "shoulders", label: "Shoulders", top: "18%", left: "13%", width: "74%", height: "8%" },
-    { id: "chest", label: "Chest", top: "26%", left: "28%", width: "44%", height: "10%" },
-    { id: "upper_arm_r", label: "Arm", top: "26%", left: "72%", width: "14%", height: "16%" },
-    { id: "waist", label: "Waist", top: "42%", left: "32%", width: "36%", height: "8%" },
-    { id: "hips", label: "Hips", top: "50%", left: "30%", width: "40%", height: "8%" },
+    { id: "shoulders", label: "Shoulders", top: "24%", left: "18%", width: "64%", height: "7%" },
+    { id: "chest", label: "Chest", top: "32%", left: "30%", width: "40%", height: "7%" },
+    { id: "upper_arm_r", label: "Arm", top: "30%", left: "70%", width: "12%", height: "16%" },
+    { id: "waist", label: "Waist", top: "47%", left: "34%", width: "32%", height: "7%" },
+    { id: "hips", label: "Hips", top: "54%", left: "32%", width: "36%", height: "7%" },
   ];
 
   const measurementLines = [
-    { id: "shoulders", y: "22%", x1: "18%", x2: "82%" },
-    { id: "chest", y: "30%", x1: "28%", x2: "72%" },
-    { id: "waist", y: "46%", x1: "34%", x2: "66%" },
-    { id: "hips", y: "54%", x1: "32%", x2: "68%" },
+    { id: "shoulders", y: "28%", x1: "20%", x2: "80%" },
+    { id: "chest", y: "35%", x1: "30%", x2: "70%" },
+    { id: "waist", y: "50%", x1: "36%", x2: "64%" },
+    { id: "hips", y: "57%", x1: "33%", x2: "67%" },
   ];
 
   return (
@@ -78,10 +78,10 @@ export function VitruvianMan({ onRegionClick, highlightedRegion }: VitruvianManP
           })}
           {/* Arm measurement line (vertical-ish) */}
           <line
-            x1="78%"
-            y1="28%"
-            x2="78%"
-            y2="40%"
+            x1="76%"
+            y1="32%"
+            x2="76%"
+            y2="44%"
             stroke={
               highlightedRegion === "upper_arm_r" || hovered === "upper_arm_r"
                 ? "#c9a84c"
