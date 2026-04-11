@@ -84,7 +84,7 @@ export function ComplianceChart({
                 {s.name}
               </p>
               <div className="flex items-baseline gap-1.5 mt-1">
-                <span className="font-mono text-lg text-gold font-semibold">
+                <span className="font-mono text-lg text-success font-semibold">
                   {s.streak}
                 </span>
                 <span className="type-micro text-text-muted">
@@ -111,7 +111,13 @@ export function ComplianceChart({
             const isFuture = date > today;
             return (
               <div key={date} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full bg-bg-elevated rounded-sm overflow-hidden h-12 flex items-end">
+                <div
+                  className={`w-full rounded-sm overflow-hidden h-12 flex items-end ${
+                    isFuture
+                      ? "border border-dashed border-border-subtle"
+                      : "bg-bg-elevated"
+                  }`}
+                >
                   {!isFuture && (
                     <div
                       className="w-full rounded-sm transition-all duration-300"
@@ -129,7 +135,7 @@ export function ComplianceChart({
                     />
                   )}
                 </div>
-                <span className="type-micro text-text-muted">
+                <span className={`type-micro ${isFuture ? "text-text-muted/50" : "text-text-muted"}`}>
                   {DAY_LABELS[i]}
                 </span>
               </div>

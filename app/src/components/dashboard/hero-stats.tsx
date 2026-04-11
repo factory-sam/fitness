@@ -143,7 +143,7 @@ export function HeroStats({
             )}
             {streak > 0 && (
               <div className="flex items-center gap-3">
-                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-gold type-micro">
+                <span className="w-5 h-5 rounded bg-bg-elevated flex items-center justify-center text-success type-micro">
                   {streak}
                 </span>
                 <span className="type-caption text-text-muted">

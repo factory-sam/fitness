@@ -6,6 +6,10 @@ __pycache__/
 .env
 .DS_Store
 .playwright-mcp/
+*.png
+
+# Next.js app
 app/node_modules/
 app/.next/
 app/.turbo/
+app/.env.local

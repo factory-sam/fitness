@@ -16,7 +16,7 @@ export function Nav() {
   const pathname = usePathname();
 
   return (
-    <nav className="w-48 min-h-screen border-r border-border bg-bg-card flex flex-col py-6 px-3 shrink-0">
+    <nav className="w-48 min-h-screen border-r border-border bg-bg-card flex flex-col py-6 pb-10 px-3 shrink-0">
       <div className="mb-8 px-2">
         <h1 className="font-serif text-xl text-gold tracking-tight">Vitruvian</h1>
         <p className="type-label text-text-muted mt-0.5">

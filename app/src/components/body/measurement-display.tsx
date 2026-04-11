@@ -80,7 +80,7 @@ export function MeasurementDisplay({
                 style={{ cursor: "pointer" }}
               >
                 <td className={isHighlighted ? "!text-white" : ""}>{part.label}</td>
-                <td className={isHighlighted ? "!text-white font-semibold" : "text-gold"}>{value ? `${value}"` : "—"}</td>
+                <td className={isHighlighted ? "!text-white font-semibold" : "text-text"}>{value ? `${value}"` : "—"}</td>
                 <td className="text-text-muted">{latest?.date ?? "—"}</td>
               </tr>
             );

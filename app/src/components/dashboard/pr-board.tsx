@@ -34,7 +34,7 @@ export function PRBoard({ prs }: { prs: PR[] }) {
               {pr.exercise}
             </span>
             <div className="flex items-baseline gap-1">
-              <span className="font-mono text-sm font-semibold text-gold">
+              <span className="font-mono text-sm font-semibold text-text">
                 {pr.max_weight}
               </span>
               <span className="type-micro text-text-muted">

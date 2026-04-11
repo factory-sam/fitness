@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { RestTimer, StopwatchTimer } from "./rest-timer";
 import { SupplementReminder } from "./supplement-reminder";
-import type { LoggedSet } from "../../app/workout/page";
+import type { LoggedSet } from "../../app/(app)/workout/page";
 
 interface ProgrammeExercise {
   id: number;

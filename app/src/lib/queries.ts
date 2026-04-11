@@ -1,24 +1,40 @@
-import { getDb } from "./db";
+import { cookies } from "next/headers";
+import { createClient } from "../utils/supabase/server";
+
+async function getSupabase() {
+  const cookieStore = await cookies();
+  return createClient(cookieStore);
+}
 
 // --- Sessions ---
 
-export function getRecentSessions(limit = 10) {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM sessions ORDER BY date DESC LIMIT ?")
-    .all(limit);
+export async function getRecentSessions(limit = 10) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("sessions")
+    .select("*")
+    .order("date", { ascending: false })
+    .limit(limit);
+  return data ?? [];
 }
 
-export function getSession(id: number) {
-  const db = getDb();
-  const session = db.prepare("SELECT * FROM sessions WHERE id = ?").get(id);
-  const sets = db
-    .prepare("SELECT * FROM sets WHERE session_id = ? ORDER BY set_number")
-    .all(id);
-  return { ...(session as Record<string, unknown>), sets };
+export async function getSession(id: number) {
+  const supabase = await getSupabase();
+  const { data: session } = await supabase
+    .from("sessions")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (!session) return null;
+  const { data: sets } = await supabase
+    .from("sets")
+    .select("*")
+    .eq("session_id", id)
+    .order("set_number");
+  return { ...session, sets: sets ?? [] };
 }
 
-export function createSession(data: {
+export async function createSession(data: {
   date: string;
   name: string;
   programme?: string;
@@ -26,22 +42,24 @@ export function createSession(data: {
   week?: number;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    "INSERT INTO sessions (date, name, programme, block, week, notes) VALUES (?, ?, ?, ?, ?, ?)"
-  );
-  const result = stmt.run(
-    data.date,
-    data.name,
-    data.programme ?? null,
-    data.block ?? null,
-    data.week ?? null,
-    data.notes ?? null
-  );
-  return result.lastInsertRowid;
+  const supabase = await getSupabase();
+  const { data: row, error } = await supabase
+    .from("sessions")
+    .insert({
+      date: data.date,
+      name: data.name,
+      programme: data.programme ?? null,
+      block: data.block ?? null,
+      week: data.week ?? null,
+      notes: data.notes ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return row!.id;
 }
 
-export function createSet(data: {
+export async function createSet(data: {
   session_id: number;
   exercise: string;
   set_number: number;
@@ -50,89 +68,116 @@ export function createSet(data: {
   weight_unit?: string;
   rpe?: number;
   duration_sec?: number;
-  is_calibration?: number;
+  is_calibration?: boolean;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    `INSERT INTO sets (session_id, exercise, set_number, reps, weight, weight_unit, rpe, duration_sec, is_calibration, notes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  );
-  return stmt.run(
-    data.session_id,
-    data.exercise,
-    data.set_number,
-    data.reps ?? null,
-    data.weight ?? null,
-    data.weight_unit ?? "lbs",
-    data.rpe ?? null,
-    data.duration_sec ?? null,
-    data.is_calibration ?? 0,
-    data.notes ?? null
-  );
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("sets").insert({
+    session_id: data.session_id,
+    exercise: data.exercise,
+    set_number: data.set_number,
+    reps: data.reps ?? null,
+    weight: data.weight ?? null,
+    weight_unit: data.weight_unit ?? "lbs",
+    rpe: data.rpe ?? null,
+    duration_sec: data.duration_sec ?? null,
+    is_calibration: data.is_calibration ?? false,
+    notes: data.notes ?? null,
+  });
+  if (error) throw error;
 }
 
 // --- Working Weights ---
 
-export function getAllWorkingWeights() {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT w.exercise, w.weight, w.weight_unit, w.date_set
-       FROM working_weights w
-       INNER JOIN (
-         SELECT exercise, MAX(date_set) as max_date FROM working_weights GROUP BY exercise
-       ) latest ON w.exercise = latest.exercise AND w.date_set = latest.max_date
-       ORDER BY w.exercise`
-    )
-    .all();
+export async function getAllWorkingWeights() {
+  const supabase = await getSupabase();
+  // Get the latest weight for each exercise
+  const { data } = await supabase
+    .from("working_weights")
+    .select("exercise, weight, weight_unit, date_set")
+    .order("date_set", { ascending: false });
+  if (!data) return [];
+  // Deduplicate: keep first (latest) per exercise
+  const seen = new Set<string>();
+  return data.filter((row) => {
+    if (seen.has(row.exercise)) return false;
+    seen.add(row.exercise);
+    return true;
+  });
 }
 
-export function getExerciseHistory(exercise: string, limit = 50) {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT s.date, s.name as session_name, st.set_number, st.reps, st.weight, st.weight_unit, st.rpe, st.duration_sec, st.notes
-       FROM sets st
-       JOIN sessions s ON st.session_id = s.id
-       WHERE st.exercise = ?
-       ORDER BY s.date DESC, st.set_number
-       LIMIT ?`
-    )
-    .all(exercise, limit);
+export async function getExerciseHistory(exercise: string, limit = 50) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("sets")
+    .select("set_number, reps, weight, weight_unit, rpe, duration_sec, notes, sessions!inner(date, name)")
+    .eq("exercise", exercise)
+    .order("id", { ascending: false })
+    .limit(limit);
+  // Flatten the join
+  return (data ?? []).map((row) => {
+    const session = row.sessions as unknown as { date: string; name: string };
+    return {
+      date: session.date,
+      session_name: session.name,
+      set_number: row.set_number,
+      reps: row.reps,
+      weight: row.weight,
+      weight_unit: row.weight_unit,
+      rpe: row.rpe,
+      duration_sec: row.duration_sec,
+      notes: row.notes,
+    };
+  });
 }
 
-export function getPersonalRecords() {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT st.exercise, MAX(st.weight) as max_weight, st.weight_unit, s.date
-       FROM sets st
-       JOIN sessions s ON st.session_id = s.id
-       WHERE st.weight IS NOT NULL
-       GROUP BY st.exercise
-       ORDER BY st.exercise`
-    )
-    .all();
+export async function getPersonalRecords() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("sets")
+    .select("exercise, weight, weight_unit, sessions!inner(date)")
+    .not("weight", "is", null)
+    .order("weight", { ascending: false });
+  if (!data) return [];
+  // Group by exercise, keep max weight
+  const prs = new Map<string, { exercise: string; max_weight: number; weight_unit: string; date: string }>();
+  for (const row of data) {
+    const session = row.sessions as unknown as { date: string };
+    if (!prs.has(row.exercise) || row.weight! > prs.get(row.exercise)!.max_weight) {
+      prs.set(row.exercise, {
+        exercise: row.exercise,
+        max_weight: row.weight!,
+        weight_unit: row.weight_unit!,
+        date: session.date,
+      });
+    }
+  }
+  return Array.from(prs.values()).sort((a, b) => a.exercise.localeCompare(b.exercise));
 }
 
 // --- Body Comp ---
 
-export function getBodyCompHistory() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM body_comp ORDER BY date DESC")
-    .all();
+export async function getBodyCompHistory() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("body_comp")
+    .select("*")
+    .order("date", { ascending: false });
+  return data ?? [];
 }
 
-export function getLatestBodyComp() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM body_comp ORDER BY date DESC LIMIT 1")
-    .get();
+export async function getLatestBodyComp() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("body_comp")
+    .select("*")
+    .order("date", { ascending: false })
+    .limit(1)
+    .single();
+  return data;
 }
 
-export function createBodyComp(data: {
+export async function createBodyComp(data: {
   date: string;
   weight_lbs?: number;
   body_fat_pct?: number;
@@ -140,37 +185,41 @@ export function createBodyComp(data: {
   vo2_max?: number;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    "INSERT INTO body_comp (date, weight_lbs, body_fat_pct, lean_mass_lbs, vo2_max, notes) VALUES (?, ?, ?, ?, ?, ?)"
-  );
-  return stmt.run(
-    data.date,
-    data.weight_lbs ?? null,
-    data.body_fat_pct ?? null,
-    data.lean_mass_lbs ?? null,
-    data.vo2_max ?? null,
-    data.notes ?? null
-  );
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("body_comp").insert({
+    date: data.date,
+    weight_lbs: data.weight_lbs ?? null,
+    body_fat_pct: data.body_fat_pct ?? null,
+    lean_mass_lbs: data.lean_mass_lbs ?? null,
+    vo2_max: data.vo2_max ?? null,
+    notes: data.notes ?? null,
+  });
+  if (error) throw error;
 }
 
 // --- Measurements ---
 
-export function getMeasurements() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM measurements ORDER BY date DESC")
-    .all();
+export async function getMeasurements() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("measurements")
+    .select("*")
+    .order("date", { ascending: false });
+  return data ?? [];
 }
 
-export function getLatestMeasurements() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM measurements ORDER BY date DESC LIMIT 1")
-    .get();
+export async function getLatestMeasurements() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("measurements")
+    .select("*")
+    .order("date", { ascending: false })
+    .limit(1)
+    .single();
+  return data;
 }
 
-export function createMeasurement(data: {
+export async function createMeasurement(data: {
   date: string;
   shoulders?: number;
   chest?: number;
@@ -182,50 +231,24 @@ export function createMeasurement(data: {
   thigh_l?: number;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    `INSERT INTO measurements (date, shoulders, chest, waist, hips, upper_arm_r, upper_arm_l, thigh_r, thigh_l, notes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-  );
-  return stmt.run(
-    data.date,
-    data.shoulders ?? null,
-    data.chest ?? null,
-    data.waist ?? null,
-    data.hips ?? null,
-    data.upper_arm_r ?? null,
-    data.upper_arm_l ?? null,
-    data.thigh_r ?? null,
-    data.thigh_l ?? null,
-    data.notes ?? null
-  );
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("measurements").insert(data);
+  if (error) throw error;
 }
 
 // --- Volume & Stats ---
 
-export function getWeeklyVolume() {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT s.date, st.exercise, COUNT(st.id) as total_sets, SUM(st.reps) as total_reps, SUM(st.reps * st.weight) as volume
-       FROM sets st
-       JOIN sessions s ON st.session_id = s.id
-       WHERE st.weight IS NOT NULL
-       GROUP BY s.date, st.exercise
-       ORDER BY s.date DESC`
-    )
-    .all();
+export async function getSessionDates() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("sessions")
+    .select("date")
+    .order("date");
+  return data ?? [];
 }
 
-export function getSessionDates() {
-  const db = getDb();
-  return db
-    .prepare("SELECT DISTINCT date FROM sessions ORDER BY date")
-    .all();
-}
-
-export function getWorkoutStreak() {
-  const dates = getSessionDates() as { date: string }[];
+export async function getWorkoutStreak() {
+  const dates = await getSessionDates();
   if (dates.length === 0) return 0;
   let streak = 1;
   const today = new Date();
@@ -248,21 +271,29 @@ export function getWorkoutStreak() {
 
 // --- Supplements ---
 
-export function getActiveSupplements() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM supplements WHERE active = 1 ORDER BY time_of_day, name")
-    .all();
+export async function getActiveSupplements() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("supplements")
+    .select("*")
+    .eq("active", true)
+    .order("time_of_day")
+    .order("name");
+  return data ?? [];
 }
 
-export function getAllSupplements() {
-  const db = getDb();
-  return db
-    .prepare("SELECT * FROM supplements ORDER BY active DESC, time_of_day, name")
-    .all();
+export async function getAllSupplements() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("supplements")
+    .select("*")
+    .order("active", { ascending: false })
+    .order("time_of_day")
+    .order("name");
+  return data ?? [];
 }
 
-export function createSupplement(data: {
+export async function createSupplement(data: {
   name: string;
   amount?: number;
   units?: string;
@@ -270,120 +301,100 @@ export function createSupplement(data: {
   frequency?: string;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    "INSERT INTO supplements (name, amount, units, time_of_day, frequency, notes) VALUES (?, ?, ?, ?, ?, ?)"
-  );
-  return stmt.run(
-    data.name,
-    data.amount ?? null,
-    data.units ?? null,
-    data.time_of_day ?? "any",
-    data.frequency ?? "daily",
-    data.notes ?? null
-  );
+  const supabase = await getSupabase();
+  const { data: row, error } = await supabase
+    .from("supplements")
+    .insert({
+      name: data.name,
+      amount: data.amount ?? null,
+      units: data.units ?? null,
+      time_of_day: data.time_of_day ?? "any",
+      frequency: data.frequency ?? "daily",
+      notes: data.notes ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return row!.id;
 }
 
-export function updateSupplement(
+export async function updateSupplement(
   id: number,
-  data: {
-    name?: string;
-    dosage?: string;
-    time_of_day?: string;
-    frequency?: string;
-    active?: number;
-    notes?: string;
-  }
+  data: Record<string, unknown>
 ) {
-  const db = getDb();
-  const fields: string[] = [];
-  const values: unknown[] = [];
-  for (const [key, val] of Object.entries(data)) {
-    if (val !== undefined) {
-      fields.push(`${key} = ?`);
-      values.push(val);
-    }
-  }
-  if (fields.length === 0) return;
-  values.push(id);
-  return db
-    .prepare(`UPDATE supplements SET ${fields.join(", ")} WHERE id = ?`)
-    .run(...values);
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("supplements")
+    .update(data)
+    .eq("id", id);
+  if (error) throw error;
 }
 
-export function logSupplementIntake(data: {
+export async function logSupplementIntake(data: {
   supplement_id: number;
   date: string;
-  taken?: number;
+  taken?: boolean;
   time_taken?: string;
   notes?: string;
 }) {
-  const db = getDb();
-  const stmt = db.prepare(
-    `INSERT INTO supplement_log (supplement_id, date, taken, time_taken, notes)
-     VALUES (?, ?, ?, ?, ?)
-     ON CONFLICT(supplement_id, date) DO UPDATE SET
-       taken = excluded.taken,
-       time_taken = excluded.time_taken,
-       notes = excluded.notes`
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("supplement_log").upsert(
+    {
+      supplement_id: data.supplement_id,
+      date: data.date,
+      taken: data.taken ?? true,
+      time_taken: data.time_taken ?? null,
+      notes: data.notes ?? null,
+    },
+    { onConflict: "supplement_id,date" }
   );
-  return stmt.run(
-    data.supplement_id,
-    data.date,
-    data.taken ?? 1,
-    data.time_taken ?? null,
-    data.notes ?? null
-  );
+  if (error) throw error;
 }
 
-export function getSupplementLogForDate(date: string) {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT sl.*, s.name, s.amount, s.units, s.time_of_day, s.frequency
-       FROM supplement_log sl
-       JOIN supplements s ON sl.supplement_id = s.id
-       WHERE sl.date = ?`
-    )
-    .all(date);
+export async function getSupplementLogForDate(date: string) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("supplement_log")
+    .select("*, supplements(name, amount, units, time_of_day, frequency)")
+    .eq("date", date);
+  return data ?? [];
 }
 
-export function getSupplementLogRange(startDate: string, endDate: string) {
-  const db = getDb();
-  return db
-    .prepare(
-      `SELECT sl.*, s.name, s.amount, s.units, s.time_of_day
-       FROM supplement_log sl
-       JOIN supplements s ON sl.supplement_id = s.id
-       WHERE sl.date BETWEEN ? AND ?
-       ORDER BY sl.date DESC`
-    )
-    .all(startDate, endDate);
+export async function getSupplementLogRange(startDate: string, endDate: string) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("supplement_log")
+    .select("*, supplements(name, amount, units, time_of_day)")
+    .gte("date", startDate)
+    .lte("date", endDate)
+    .order("date", { ascending: false });
+  return data ?? [];
 }
 
-export function getSupplementStreaks() {
-  const db = getDb();
-  const supplements = db
-    .prepare("SELECT * FROM supplements WHERE active = 1")
-    .all() as { id: number; name: string }[];
+export async function getSupplementStreaks() {
+  const supabase = await getSupabase();
+  const { data: supplements } = await supabase
+    .from("supplements")
+    .select("id, name")
+    .eq("active", true);
+  if (!supplements) return [];
 
   const today = new Date().toISOString().split("T")[0];
   const streaks: { id: number; name: string; streak: number; longest: number }[] = [];
 
   for (const supp of supplements) {
-    const logs = db
-      .prepare(
-        "SELECT date FROM supplement_log WHERE supplement_id = ? AND taken = 1 ORDER BY date DESC"
-      )
-      .all(supp.id) as { date: string }[];
+    const { data: logs } = await supabase
+      .from("supplement_log")
+      .select("date")
+      .eq("supplement_id", supp.id)
+      .eq("taken", true)
+      .order("date", { ascending: false });
 
     let streak = 0;
-    let checkDate = new Date(today);
-
-    for (const log of logs) {
-      const logDate = log.date;
+    const checkDate = new Date(today);
+    for (const log of logs ?? []) {
       const expected = checkDate.toISOString().split("T")[0];
-      if (logDate === expected) {
+      if (log.date === expected) {
         streak++;
         checkDate.setDate(checkDate.getDate() - 1);
       } else {
@@ -391,21 +402,21 @@ export function getSupplementStreaks() {
       }
     }
 
-    // Longest streak
+    const { data: allLogs } = await supabase
+      .from("supplement_log")
+      .select("date")
+      .eq("supplement_id", supp.id)
+      .eq("taken", true)
+      .order("date");
+
     let longest = 0;
     let currentRun = 0;
-    const allLogs = db
-      .prepare(
-        "SELECT date FROM supplement_log WHERE supplement_id = ? AND taken = 1 ORDER BY date"
-      )
-      .all(supp.id) as { date: string }[];
-
-    for (let i = 0; i < allLogs.length; i++) {
+    for (let i = 0; i < (allLogs ?? []).length; i++) {
       if (i === 0) {
         currentRun = 1;
       } else {
-        const prev = new Date(allLogs[i - 1].date);
-        const curr = new Date(allLogs[i].date);
+        const prev = new Date(allLogs![i - 1].date);
+        const curr = new Date(allLogs![i].date);
         const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
         currentRun = diff === 1 ? currentRun + 1 : 1;
       }
@@ -418,73 +429,82 @@ export function getSupplementStreaks() {
   return streaks;
 }
 
-export function getSupplementComplianceStats(days = 30) {
-  const db = getDb();
+export async function getSupplementComplianceStats(days = 30) {
+  const supabase = await getSupabase();
   const endDate = new Date().toISOString().split("T")[0];
   const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
     .toISOString()
     .split("T")[0];
 
-  const activeSupps = db
-    .prepare("SELECT COUNT(*) as count FROM supplements WHERE active = 1")
-    .get() as { count: number };
+  const { data: activeSupps } = await supabase
+    .from("supplements")
+    .select("id")
+    .eq("active", true);
+  const totalActive = activeSupps?.length ?? 0;
 
-  const dailyCompliance = db
-    .prepare(
-      `SELECT date, COUNT(*) as taken_count
-       FROM supplement_log
-       WHERE taken = 1 AND date BETWEEN ? AND ?
-       GROUP BY date
-       ORDER BY date`
-    )
-    .all(startDate, endDate) as { date: string; taken_count: number }[];
+  const { data: logs } = await supabase
+    .from("supplement_log")
+    .select("date")
+    .eq("taken", true)
+    .gte("date", startDate)
+    .lte("date", endDate);
 
-  return {
-    totalActive: activeSupps.count,
-    dailyCompliance: dailyCompliance.map((d) => ({
-      ...d,
-      compliance: activeSupps.count > 0 ? d.taken_count / activeSupps.count : 0,
-    })),
-  };
+  // Group by date
+  const countByDate = new Map<string, number>();
+  for (const log of logs ?? []) {
+    countByDate.set(log.date, (countByDate.get(log.date) ?? 0) + 1);
+  }
+
+  const dailyCompliance = Array.from(countByDate.entries())
+    .map(([date, taken_count]) => ({
+      date,
+      taken_count,
+      compliance: totalActive > 0 ? taken_count / totalActive : 0,
+    }))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  return { totalActive, dailyCompliance };
 }
 
-export function getUntakenSupplementsToday() {
-  const db = getDb();
+export async function getUntakenSupplementsToday() {
+  const supabase = await getSupabase();
   const today = new Date().toISOString().split("T")[0];
-  return db
-    .prepare(
-      `SELECT s.* FROM supplements s
-       WHERE s.active = 1
-       AND s.id NOT IN (
-         SELECT supplement_id FROM supplement_log WHERE date = ? AND taken = 1
-       )
-       ORDER BY s.time_of_day, s.name`
-    )
-    .all(today);
+
+  const { data: takenIds } = await supabase
+    .from("supplement_log")
+    .select("supplement_id")
+    .eq("date", today)
+    .eq("taken", true);
+
+  const taken = new Set((takenIds ?? []).map((r) => r.supplement_id));
+
+  const { data: active } = await supabase
+    .from("supplements")
+    .select("*")
+    .eq("active", true)
+    .order("time_of_day")
+    .order("name");
+
+  return (active ?? []).filter((s) => !taken.has(s.id));
 }
 
 // --- Programme ---
 
-export function getProgrammeDays() {
-  const db = getDb();
-  try {
-    return db
-      .prepare("SELECT * FROM programme_days ORDER BY day_number")
-      .all();
-  } catch {
-    return [];
-  }
+export async function getProgrammeDays() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("programme_days")
+    .select("*")
+    .order("day_number");
+  return data ?? [];
 }
 
-export function getProgrammeExercises(dayId: number) {
-  const db = getDb();
-  try {
-    return db
-      .prepare(
-        "SELECT * FROM programme_exercises WHERE day_id = ? ORDER BY exercise_order"
-      )
-      .all(dayId);
-  } catch {
-    return [];
-  }
+export async function getProgrammeExercises(dayId: number) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("programme_exercises")
+    .select("*")
+    .eq("day_id", dayId)
+    .order("exercise_order");
+  return data ?? [];
 }

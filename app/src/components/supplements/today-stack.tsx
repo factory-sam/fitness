@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface Supplement {
   id: number;
   name: string;
@@ -60,11 +58,11 @@ export function TodayStack({
           </span>
           <div className="w-24 h-1.5 bg-bg-elevated rounded-full overflow-hidden">
             <div
-              className="h-full bg-gold rounded-full transition-all duration-500"
+              className="h-full bg-success rounded-full transition-all duration-500"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <span className="font-mono text-xs text-gold">{pct}%</span>
+          <span className="font-mono text-xs text-success">{pct}%</span>
         </div>
       </div>
 
@@ -92,14 +90,14 @@ export function TodayStack({
                   onClick={() => onToggle(supp.id, !taken)}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-left group min-w-0 ${
                     taken
-                      ? "bg-gold-muted/30 border border-gold-dim/50"
+                      ? "bg-success/10 border border-success/30"
                       : "bg-bg-elevated/50 border border-border-subtle hover:border-gold-dim/30"
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${
                       taken
-                        ? "bg-gold border-gold text-bg"
+                        ? "bg-success border-success text-bg"
                         : "border-border hover:border-gold-dim"
                     }`}
                   >
@@ -115,7 +113,7 @@ export function TodayStack({
                   </div>
                   <span
                     className={`font-mono text-sm flex-1 truncate ${
-                      taken ? "text-gold line-through opacity-60" : "text-text"
+                      taken ? "text-success line-through opacity-60" : "text-text"
                     }`}
                   >
                     {supp.name}

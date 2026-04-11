@@ -1,6 +1,6 @@
 "use client";
 
-import type { LoggedSet } from "../../app/workout/page";
+import type { LoggedSet } from "../../app/(app)/workout/page";
 
 export function WorkoutSummary({
   dayName,

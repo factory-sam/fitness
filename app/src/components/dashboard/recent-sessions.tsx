@@ -30,30 +30,28 @@ export function RecentSessions({ sessions }: { sessions: Session[] }) {
   return (
     <div className="card">
       <h2 className="section-heading mb-4">Recent Sessions</h2>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Session</th>
-            <th>Block</th>
-            <th>Week</th>
-            <th>Notes</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sessions.map((s, i) => (
-            <tr key={s.id ?? i}>
-              <td className="text-gold">{s.date}</td>
-              <td>{s.name}</td>
-              <td>{s.block ?? "—"}</td>
-              <td>{s.week ?? "—"}</td>
-              <td className="text-text-muted max-w-48 truncate">
-                {s.notes ?? "—"}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="space-y-0">
+        {sessions.map((s, i) => (
+          <div
+            key={s.id ?? i}
+            className="flex items-baseline justify-between py-2 border-b border-border-subtle last:border-0"
+          >
+            <div className="min-w-0">
+              <span className="font-mono text-sm text-text">
+                {s.name}
+              </span>
+              {s.notes && s.notes !== "—" && (
+                <p className="type-micro text-text-muted truncate mt-0.5">
+                  {s.notes}
+                </p>
+              )}
+            </div>
+            <span className="font-mono text-xs text-text-muted shrink-0 ml-3">
+              {s.date}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

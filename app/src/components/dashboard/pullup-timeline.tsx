@@ -51,7 +51,7 @@ export function PullUpTimeline() {
             <div className="pb-1">
               <p
                 className={`font-mono text-xs ${
-                  m.status === "active" ? "text-gold" : "text-text-secondary"
+                  m.status === "active" ? "text-text" : "text-text-secondary"
                 }`}
               >
                 {m.label}

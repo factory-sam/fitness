@@ -137,15 +137,27 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 1.25rem;
+}
+
+.card-interactive {
   transition: border-color 0.2s ease;
 }
 
-.card:hover {
+.card-interactive:hover {
   border-color: var(--color-gold-dim);
 }
 
 /* Metric big number — uses display scale */
 .metric-value {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 1.953rem;
+  line-height: 1;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-value-accent {
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 1.953rem;
