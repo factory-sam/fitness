@@ -74,12 +74,41 @@ def init():
         )
     """)
 
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS supplements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            dosage TEXT,
+            time_of_day TEXT DEFAULT 'any',
+            frequency TEXT DEFAULT 'daily',
+            active INTEGER DEFAULT 1,
+            notes TEXT,
+            created_at TEXT DEFAULT (datetime('now'))
+        )
+    """)
+
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS supplement_log (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            supplement_id INTEGER NOT NULL,
+            date TEXT NOT NULL,
+            taken INTEGER DEFAULT 1,
+            time_taken TEXT,
+            notes TEXT,
+            created_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (supplement_id) REFERENCES supplements(id),
+            UNIQUE(supplement_id, date)
+        )
+    """)
+
     # Indexes for common queries
     c.execute("CREATE INDEX IF NOT EXISTS idx_sets_exercise ON sets(exercise)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_sets_session ON sets(session_id)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_sessions_date ON sessions(date)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_working_weights_exercise ON working_weights(exercise)")
     c.execute("CREATE INDEX IF NOT EXISTS idx_body_comp_date ON body_comp(date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_supplement_log_date ON supplement_log(date)")
+    c.execute("CREATE INDEX IF NOT EXISTS idx_supplement_log_supp ON supplement_log(supplement_id)")
 
     conn.commit()
 

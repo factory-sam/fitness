@@ -7,6 +7,7 @@ const links = [
   { href: "/", label: "Dashboard", icon: "◈" },
   { href: "/workout", label: "Workout", icon: "▶" },
   { href: "/body", label: "Body", icon: "◉" },
+  { href: "/supplements", label: "Supplements", icon: "⊕" },
   { href: "/programme", label: "Programme", icon: "☰" },
   { href: "/exercises", label: "Exercises", icon: "⊞" },
 ];

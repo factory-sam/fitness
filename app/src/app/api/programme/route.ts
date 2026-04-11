@@ -1,10 +1,9 @@
-import { getDb } from "../../../lib/queries";
-import { getDb as getDatabase } from "../../../lib/db";
+import { getDb } from "../../../lib/db";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const dayNumber = url.searchParams.get("day");
-  const db = getDatabase();
+  const db = getDb();
 
   if (dayNumber) {
     const day = db

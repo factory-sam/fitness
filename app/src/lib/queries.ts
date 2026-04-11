@@ -246,6 +246,221 @@ export function getWorkoutStreak() {
   return streak;
 }
 
+// --- Supplements ---
+
+export function getActiveSupplements() {
+  const db = getDb();
+  return db
+    .prepare("SELECT * FROM supplements WHERE active = 1 ORDER BY time_of_day, name")
+    .all();
+}
+
+export function getAllSupplements() {
+  const db = getDb();
+  return db
+    .prepare("SELECT * FROM supplements ORDER BY active DESC, time_of_day, name")
+    .all();
+}
+
+export function createSupplement(data: {
+  name: string;
+  dosage?: string;
+  time_of_day?: string;
+  frequency?: string;
+  notes?: string;
+}) {
+  const db = getDb();
+  const stmt = db.prepare(
+    "INSERT INTO supplements (name, dosage, time_of_day, frequency, notes) VALUES (?, ?, ?, ?, ?)"
+  );
+  return stmt.run(
+    data.name,
+    data.dosage ?? null,
+    data.time_of_day ?? "any",
+    data.frequency ?? "daily",
+    data.notes ?? null
+  );
+}
+
+export function updateSupplement(
+  id: number,
+  data: {
+    name?: string;
+    dosage?: string;
+    time_of_day?: string;
+    frequency?: string;
+    active?: number;
+    notes?: string;
+  }
+) {
+  const db = getDb();
+  const fields: string[] = [];
+  const values: unknown[] = [];
+  for (const [key, val] of Object.entries(data)) {
+    if (val !== undefined) {
+      fields.push(`${key} = ?`);
+      values.push(val);
+    }
+  }
+  if (fields.length === 0) return;
+  values.push(id);
+  return db
+    .prepare(`UPDATE supplements SET ${fields.join(", ")} WHERE id = ?`)
+    .run(...values);
+}
+
+export function logSupplementIntake(data: {
+  supplement_id: number;
+  date: string;
+  taken?: number;
+  time_taken?: string;
+  notes?: string;
+}) {
+  const db = getDb();
+  const stmt = db.prepare(
+    `INSERT INTO supplement_log (supplement_id, date, taken, time_taken, notes)
+     VALUES (?, ?, ?, ?, ?)
+     ON CONFLICT(supplement_id, date) DO UPDATE SET
+       taken = excluded.taken,
+       time_taken = excluded.time_taken,
+       notes = excluded.notes`
+  );
+  return stmt.run(
+    data.supplement_id,
+    data.date,
+    data.taken ?? 1,
+    data.time_taken ?? null,
+    data.notes ?? null
+  );
+}
+
+export function getSupplementLogForDate(date: string) {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT sl.*, s.name, s.dosage, s.time_of_day, s.frequency
+       FROM supplement_log sl
+       JOIN supplements s ON sl.supplement_id = s.id
+       WHERE sl.date = ?`
+    )
+    .all(date);
+}
+
+export function getSupplementLogRange(startDate: string, endDate: string) {
+  const db = getDb();
+  return db
+    .prepare(
+      `SELECT sl.*, s.name, s.dosage, s.time_of_day
+       FROM supplement_log sl
+       JOIN supplements s ON sl.supplement_id = s.id
+       WHERE sl.date BETWEEN ? AND ?
+       ORDER BY sl.date DESC`
+    )
+    .all(startDate, endDate);
+}
+
+export function getSupplementStreaks() {
+  const db = getDb();
+  const supplements = db
+    .prepare("SELECT * FROM supplements WHERE active = 1")
+    .all() as { id: number; name: string }[];
+
+  const today = new Date().toISOString().split("T")[0];
+  const streaks: { id: number; name: string; streak: number; longest: number }[] = [];
+
+  for (const supp of supplements) {
+    const logs = db
+      .prepare(
+        "SELECT date FROM supplement_log WHERE supplement_id = ? AND taken = 1 ORDER BY date DESC"
+      )
+      .all(supp.id) as { date: string }[];
+
+    let streak = 0;
+    let checkDate = new Date(today);
+
+    for (const log of logs) {
+      const logDate = log.date;
+      const expected = checkDate.toISOString().split("T")[0];
+      if (logDate === expected) {
+        streak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        break;
+      }
+    }
+
+    // Longest streak
+    let longest = 0;
+    let currentRun = 0;
+    const allLogs = db
+      .prepare(
+        "SELECT date FROM supplement_log WHERE supplement_id = ? AND taken = 1 ORDER BY date"
+      )
+      .all(supp.id) as { date: string }[];
+
+    for (let i = 0; i < allLogs.length; i++) {
+      if (i === 0) {
+        currentRun = 1;
+      } else {
+        const prev = new Date(allLogs[i - 1].date);
+        const curr = new Date(allLogs[i].date);
+        const diff = (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24);
+        currentRun = diff === 1 ? currentRun + 1 : 1;
+      }
+      longest = Math.max(longest, currentRun);
+    }
+
+    streaks.push({ id: supp.id, name: supp.name, streak, longest });
+  }
+
+  return streaks;
+}
+
+export function getSupplementComplianceStats(days = 30) {
+  const db = getDb();
+  const endDate = new Date().toISOString().split("T")[0];
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+
+  const activeSupps = db
+    .prepare("SELECT COUNT(*) as count FROM supplements WHERE active = 1")
+    .get() as { count: number };
+
+  const dailyCompliance = db
+    .prepare(
+      `SELECT date, COUNT(*) as taken_count
+       FROM supplement_log
+       WHERE taken = 1 AND date BETWEEN ? AND ?
+       GROUP BY date
+       ORDER BY date`
+    )
+    .all(startDate, endDate) as { date: string; taken_count: number }[];
+
+  return {
+    totalActive: activeSupps.count,
+    dailyCompliance: dailyCompliance.map((d) => ({
+      ...d,
+      compliance: activeSupps.count > 0 ? d.taken_count / activeSupps.count : 0,
+    })),
+  };
+}
+
+export function getUntakenSupplementsToday() {
+  const db = getDb();
+  const today = new Date().toISOString().split("T")[0];
+  return db
+    .prepare(
+      `SELECT s.* FROM supplements s
+       WHERE s.active = 1
+       AND s.id NOT IN (
+         SELECT supplement_id FROM supplement_log WHERE date = ? AND taken = 1
+       )
+       ORDER BY s.time_of_day, s.name`
+    )
+    .all(today);
+}
+
 // --- Programme ---
 
 export function getProgrammeDays() {

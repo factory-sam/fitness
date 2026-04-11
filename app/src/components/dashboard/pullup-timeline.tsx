@@ -1,4 +1,4 @@
-const milestones = [
+const milestones: { label: string; status: "active" | "complete" | "upcoming"; detail: string }[] = [
   {
     label: "Dead Hangs + Lat Pulldowns",
     status: "active" as const,

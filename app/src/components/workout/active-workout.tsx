@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { RestTimer, StopwatchTimer } from "./rest-timer";
+import { SupplementReminder } from "./supplement-reminder";
 import type { LoggedSet } from "../../app/workout/page";
 
 interface ProgrammeExercise {
@@ -192,6 +193,9 @@ export function ActiveWorkout({
           </div>
         </div>
       )}
+
+      {/* Supplement reminder */}
+      <SupplementReminder />
 
       {/* Warm-up section */}
       {warmupExercises.length > 0 && (
