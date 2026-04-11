@@ -138,6 +138,17 @@ Leg Press Calf Raise [yes]
 
 ---
 
+## WARM-UP & MOBILITY
+
+Shoulder Dislocates (band/PVC)  [YES] — upper day warm-up, 2x15
+Cat-Cow / Thoracic Extensions   [YES] — upper day warm-up, 2x10
+Scapular Pull-Ups               [YES] — dead hang → retract/depress, 2x8. Pull-up activation.
+Hip 90/90 Stretch               [YES] — lower day warm-up
+Goblet Squat Hold (light)       [YES] — lower day warm-up, ankle/hip mobility
+World's Greatest Stretch        [YES] — full body warm-up option
+
+---
+
 ## NOTES & PREFERENCES
 
 Injuries / limitations:

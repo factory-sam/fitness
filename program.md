@@ -46,25 +46,59 @@
 | Block 3 (Wk 9–11) | Band-assisted pull-ups for reps, test unassisted pull-up |
 | Deload (Wk 12) | Light pulldowns only, test max dead hang hold |
 
+### Weekly Volume Audit (Hard Sets Per Muscle Group)
+
+| Muscle Group | Day 1 (Upper A) | Day 2 (Lower A) | Day 3 (Upper B) | Day 4 (Lower B) | Weekly Total | Target |
+|---|---|---|---|---|---|---|
+| Chest | 7 (incline 4, bench 3) | — | 3 (cable fly) | — | 10 | 10–14 |
+| Back (lats) | 7 (pulldown 4, SAP 3) | — | 7 (cable row 4, DB row 3) | — | 14 | 14–18 |
+| Shoulders (side/rear) | 6 (face pull 3, lat raise 3) | — | 7 (shoulder press 4, Arnold 3) | — | 13 | 8–12 |
+| Quads | — | 11 (goblet 4, leg press 4, ext 3) | — | 3 (BSS 3) | 14 | 10–14 |
+| Hamstrings/Glutes | — | 3 (leg curl 3) | — | 9 (sumo DL 3, leg curl 3, glute bridge 3) | 12 | 10–14 |
+| Biceps | 3 (hammer curl) | — | 3 (EZ curl) | — | 6 | 6–10 |
+| Triceps | 7 (indirect from pressing) | — | 3 (pushdown) + indirect | — | 10 | 6–10 |
+| Core | — | 6 (dead bug 3, cable crunch 3) | — | 6 (hang leg raise 3, plank 3) | 12 | 6–8 |
+| Calves | — | 3 (standing) | — | 3 (seated) | 6 | 6–8 |
+
+**Notes:** Back volume is high intentionally — pull-up progression requires it. Shoulders are slightly above range due to rear delt work doubling as shoulder health; can trim if recovery suffers. Core is above target — can drop to 2 sets per exercise if sessions run long.
+
 ---
 
 ### DAY 1 — UPPER A (Horizontal Push + Vertical Pull)
 
 **Block 1, Week 1 (Calibration)**
-~70 min | All weights are return-adjusted or calibration estimates
+~70–75 min | All weights are return-adjusted or calibration estimates
+Default tempo: compounds 2-1-1, accessories 3-1-1
+
+**Warm-Up (10 min)**
+
+| # | Exercise | Sets x Reps | Weight | Notes |
+|---|---|---|---|---|
+| W1 | Rower or Bike | 5 min | — | Easy pace, get blood moving. |
+| W2 | Shoulder Dislocates (band) | 2 x 15 | — | Slow, full ROM. |
+| W3 | Cat-Cow / Thoracic Ext | 2 x 10 | — | Open up the upper back. |
+| W4 | Scapular Pull-Ups | 2 x 8 | BW | Dead hang → retract/depress scapulae. Pull-up activation. |
+
+**Working Sets**
+
+Superset pairings shown as A1/A2, etc. Rest 60–90s between pairs.
 
 | # | Exercise | Sets x Reps | Weight | RPE | Rest | Notes |
 |---|---|---|---|---|---|---|
-| 1 | Lat Pulldown (wide grip) | 4 x 12 | 80 lbs* | 6–7 | 90s | *Calibrate. Pull-up foundation — full ROM, 2 sec squeeze at bottom. |
-| 2 | DB Incline Bench Press | 4 x 10 | 30 lbs/arm | 6–7 | 90s | Controlled descent, full stretch. |
-| 3 | Barbell Bench Press | 3 x 10 | 85 lbs* | 6–7 | 90s | *Calibrate. Estimated from DB incline. Find a comfortable groove. |
-| 4 | Straight Arm Pulldown | 3 x 12 | 40 lbs* | 6–7 | 60s | *Calibrate. Lat activation — keep arms straight, squeeze at hips. |
-| 5 | Face Pull (cable) | 3 x 15 | 30 lbs* | 6–7 | 60s | *Calibrate. Shoulder health + rear delts. High pull, external rotate. |
-| 6 | Lateral Raise (DB) | 3 x 12 | 15 lbs/arm | 7 | 60s | Controlled tempo — no swinging. |
-| 7 | Hammer Curl | 3 x 10 | 30 lbs/arm | 6–7 | 60s | Brachialis + forearm — supports pull-up grip. |
-| 8 | Dead Hang | 3 x max hold | BW | — | 60s | Grip + shoulder stability. Log your times. |
+| — | *Lat Pulldown ramp* | 1x12, 1x8, 1x5 | 30, 50, 65 lbs | — | — | Warm-up ramp for first compound. |
+| A1 | Lat Pulldown (wide grip) | 4 x 12 | 80 lbs* | 6–7 | 60s | *Calibrate. Pull-up foundation — full ROM, 2 sec squeeze at bottom. |
+| A2 | DB Incline Bench Press | 4 x 10 | 30 lbs/arm | 6–7 | 90s | Antagonist superset. Controlled descent, full stretch. |
+| — | *Bench ramp* | 1x8, 1x5 | 45, 65 lbs | — | — | Ramp for second compound. |
+| B1 | Barbell Bench Press | 3 x 10 | 85 lbs* | 6–7 | 90s | *Calibrate. Solo — heavy compound, find your groove. |
+| C1 | Straight Arm Pulldown | 3 x 12 | 40 lbs* | 6–7 | 30s | *Calibrate. Arms straight, squeeze at hips. |
+| C2 | Face Pull (cable) | 3 x 15 | 30 lbs* | 6–7 | 60s | *Calibrate. High pull, external rotate at top. |
+| D1 | Dead Hang | 3 x max hold | BW | — | 30s | Log your times. Grip is still fresh before curls. |
+| D2 | Lateral Raise (DB) | 3 x 12 | 15 lbs/arm | 7 | 60s | No swinging. Controlled tempo. |
+| E1 | Hammer Curl | 3 x 10 | 30 lbs/arm | 6–7 | 60s | Arms last — grip fatigue doesn't matter here. |
 
 **Exercises marked * need calibration.** If the first set is too easy (RPE 5 or below) or too hard (RPE 8+), adjust by 10 lbs and note the final weight in your log.
+
+**Optional finisher:** 10 min Zone 2 on rower or bike.
 
 ---
 
