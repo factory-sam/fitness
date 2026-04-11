@@ -20,11 +20,7 @@ export async function getRecentSessions(limit = 10) {
 
 export async function getSession(id: number) {
   const supabase = await getSupabase();
-  const { data: session } = await supabase
-    .from("sessions")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const { data: session } = await supabase.from("sessions").select("*").eq("id", id).single();
   if (!session) return null;
   const { data: sets } = await supabase
     .from("sets")
@@ -110,7 +106,9 @@ export async function getExerciseHistory(exercise: string, limit = 50) {
   const supabase = await getSupabase();
   const { data } = await supabase
     .from("sets")
-    .select("set_number, reps, weight, weight_unit, rpe, duration_sec, notes, sessions!inner(date, name)")
+    .select(
+      "set_number, reps, weight, weight_unit, rpe, duration_sec, notes, sessions!inner(date, name)",
+    )
     .eq("exercise", exercise)
     .order("id", { ascending: false })
     .limit(limit);
@@ -140,7 +138,10 @@ export async function getPersonalRecords() {
     .order("weight", { ascending: false });
   if (!data) return [];
   // Group by exercise, keep max weight
-  const prs = new Map<string, { exercise: string; max_weight: number; weight_unit: string; date: string }>();
+  const prs = new Map<
+    string,
+    { exercise: string; max_weight: number; weight_unit: string; date: string }
+  >();
   for (const row of data) {
     const session = row.sessions as unknown as { date: string };
     if (!prs.has(row.exercise) || row.weight! > prs.get(row.exercise)!.max_weight) {
@@ -159,10 +160,7 @@ export async function getPersonalRecords() {
 
 export async function getBodyCompHistory() {
   const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("body_comp")
-    .select("*")
-    .order("date", { ascending: false });
+  const { data } = await supabase.from("body_comp").select("*").order("date", { ascending: false });
   return data ?? [];
 }
 
@@ -240,10 +238,7 @@ export async function createMeasurement(data: {
 
 export async function getSessionDates() {
   const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("sessions")
-    .select("date")
-    .order("date");
+  const { data } = await supabase.from("sessions").select("date").order("date");
   return data ?? [];
 }
 
@@ -253,16 +248,12 @@ export async function getWorkoutStreak() {
   let streak = 1;
   const today = new Date();
   const lastDate = new Date(dates[dates.length - 1].date);
-  const diffDays = Math.floor(
-    (today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24)
-  );
+  const diffDays = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays > 3) return 0;
   for (let i = dates.length - 1; i > 0; i--) {
     const curr = new Date(dates[i].date);
     const prev = new Date(dates[i - 1].date);
-    const diff = Math.floor(
-      (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
-    );
+    const diff = Math.floor((curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24));
     if (diff <= 3) streak++;
     else break;
   }
@@ -318,15 +309,9 @@ export async function createSupplement(data: {
   return row!.id;
 }
 
-export async function updateSupplement(
-  id: number,
-  data: Record<string, unknown>
-) {
+export async function updateSupplement(id: number, data: Record<string, unknown>) {
   const supabase = await getSupabase();
-  const { error } = await supabase
-    .from("supplements")
-    .update(data)
-    .eq("id", id);
+  const { error } = await supabase.from("supplements").update(data).eq("id", id);
   if (error) throw error;
 }
 
@@ -346,7 +331,7 @@ export async function logSupplementIntake(data: {
       time_taken: data.time_taken ?? null,
       notes: data.notes ?? null,
     },
-    { onConflict: "supplement_id,date" }
+    { onConflict: "supplement_id,date" },
   );
   if (error) throw error;
 }
@@ -432,14 +417,9 @@ export async function getSupplementStreaks() {
 export async function getSupplementComplianceStats(days = 30) {
   const supabase = await getSupabase();
   const endDate = new Date().toISOString().split("T")[0];
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
+  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
 
-  const { data: activeSupps } = await supabase
-    .from("supplements")
-    .select("id")
-    .eq("active", true);
+  const { data: activeSupps } = await supabase.from("supplements").select("id").eq("active", true);
   const totalActive = activeSupps?.length ?? 0;
 
   const { data: logs } = await supabase
@@ -492,10 +472,7 @@ export async function getUntakenSupplementsToday() {
 
 export async function getProgrammeDays() {
   const supabase = await getSupabase();
-  const { data } = await supabase
-    .from("programme_days")
-    .select("*")
-    .order("day_number");
+  const { data } = await supabase.from("programme_days").select("*").order("day_number");
   return data ?? [];
 }
 

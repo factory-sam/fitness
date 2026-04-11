@@ -87,7 +87,7 @@ export default function SupplementsPage() {
       const existing = prev.find((l) => l.supplement_id === supplementId);
       if (existing) {
         return prev.map((l) =>
-          l.supplement_id === supplementId ? { ...l, taken: taken ? 1 : 0 } : l
+          l.supplement_id === supplementId ? { ...l, taken: taken ? 1 : 0 } : l,
         );
       }
       return [...prev, { supplement_id: supplementId, taken: taken ? 1 : 0, time_taken: null }];
@@ -168,7 +168,10 @@ export default function SupplementsPage() {
         <div className="border border-error/50 rounded-md bg-error/10 px-4 py-3 flex items-center justify-between">
           <span className="type-secondary text-error">{error}</span>
           <button
-            onClick={() => { setError(null); fetchAll(); }}
+            onClick={() => {
+              setError(null);
+              fetchAll();
+            }}
             className="type-micro text-text-secondary hover:text-gold transition-colors ml-4"
           >
             Retry
@@ -181,21 +184,13 @@ export default function SupplementsPage() {
           <p className="type-secondary text-text-muted">Loading supplements...</p>
         </div>
       ) : (
-      <>
-      <TodayStack
-        supplements={supplements}
-        todayLog={todayLog}
-        onToggle={handleToggle}
-      />
+        <>
+          <TodayStack supplements={supplements} todayLog={todayLog} onToggle={handleToggle} />
 
-      <ComplianceChart streaks={streaks} compliance={compliance} />
+          <ComplianceChart streaks={streaks} compliance={compliance} />
 
-      <ManageStack
-        supplements={allSupplements}
-        onAdd={handleAdd}
-        onUpdate={handleUpdate}
-      />
-      </>
+          <ManageStack supplements={allSupplements} onAdd={handleAdd} onUpdate={handleUpdate} />
+        </>
       )}
     </div>
   );

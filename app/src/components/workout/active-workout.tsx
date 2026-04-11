@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState } from "react";
 import { RestTimer, StopwatchTimer } from "./rest-timer";
 import { SupplementReminder } from "./supplement-reminder";
 import type { LoggedSet } from "../../app/(app)/workout/page";
@@ -42,9 +42,7 @@ export function ActiveWorkout({
   const workingExercises = day.exercises.filter((e) => !e.is_warmup);
   const warmupExercises = day.exercises.filter((e) => e.is_warmup);
 
-  const [exerciseSets, setExerciseSets] = useState<
-    Record<string, SetEntry[]>
-  >(() => {
+  const [exerciseSets, setExerciseSets] = useState<Record<string, SetEntry[]>>(() => {
     const initial: Record<string, SetEntry[]> = {};
     for (const ex of workingExercises) {
       const numSets = ex.sets ?? 1;
@@ -71,12 +69,7 @@ export function ActiveWorkout({
   const [notes, setNotes] = useState("");
   const [showFinishConfirm, setShowFinishConfirm] = useState(false);
 
-  const updateSet = (
-    exercise: string,
-    setIdx: number,
-    field: keyof SetEntry,
-    value: string
-  ) => {
+  const updateSet = (exercise: string, setIdx: number, field: keyof SetEntry, value: string) => {
     setExerciseSets((prev) => {
       const copy = { ...prev };
       copy[exercise] = [...copy[exercise]];
@@ -97,22 +90,19 @@ export function ActiveWorkout({
     }
   };
 
-  const handleStopwatchStop = useCallback(
-    (exercise: string, setIdx: number, elapsed: number) => {
-      setExerciseSets((prev) => {
-        const copy = { ...prev };
-        copy[exercise] = [...copy[exercise]];
-        copy[exercise][setIdx] = {
-          ...copy[exercise][setIdx],
-          done: true,
-          duration_sec: elapsed,
-        };
-        return copy;
-      });
-      setStopwatch(null);
-    },
-    []
-  );
+  const handleStopwatchStop = (exercise: string, setIdx: number, elapsed: number) => {
+    setExerciseSets((prev) => {
+      const copy = { ...prev };
+      copy[exercise] = [...copy[exercise]];
+      copy[exercise][setIdx] = {
+        ...copy[exercise][setIdx],
+        done: true,
+        duration_sec: elapsed,
+      };
+      return copy;
+    });
+    setStopwatch(null);
+  };
 
   const handleFinish = () => {
     const allSets: LoggedSet[] = [];
@@ -139,8 +129,7 @@ export function ActiveWorkout({
     onFinish(allSets, notes);
   };
 
-  const isDeadHang = (name: string) =>
-    name.toLowerCase().includes("dead hang");
+  const isDeadHang = (name: string) => name.toLowerCase().includes("dead hang");
 
   const totalSets = Object.values(exerciseSets).flat().length;
   const doneSets = Object.values(exerciseSets)
@@ -179,16 +168,10 @@ export function ActiveWorkout({
       {stopwatch && (
         <div className="fixed inset-0 bg-bg/90 z-50 flex items-center justify-center">
           <div className="card text-center">
-            <p className="font-mono text-xs text-text-secondary mb-2">
-              {stopwatch.exercise}
-            </p>
+            <p className="font-mono text-xs text-text-secondary mb-2">{stopwatch.exercise}</p>
             <StopwatchTimer
               onStop={(elapsed) =>
-                handleStopwatchStop(
-                  stopwatch.exercise,
-                  stopwatch.setIdx,
-                  elapsed
-                )
+                handleStopwatchStop(stopwatch.exercise, stopwatch.setIdx, elapsed)
               }
             />
           </div>
@@ -206,17 +189,16 @@ export function ActiveWorkout({
           </h2>
           <div className="space-y-1">
             {warmupExercises.map((ex) => (
-              <div
-                key={ex.id}
-                className="flex items-center gap-3 py-2 px-3 rounded bg-bg-elevated"
-              >
+              <div key={ex.id} className="flex items-center gap-3 py-2 px-3 rounded bg-bg-elevated">
                 <button
                   onClick={() =>
                     setWarmupsDone((prev) => {
                       const next = new Set(prev);
-                      next.has(ex.exercise)
-                        ? next.delete(ex.exercise)
-                        : next.add(ex.exercise);
+                      if (next.has(ex.exercise)) {
+                        next.delete(ex.exercise);
+                      } else {
+                        next.add(ex.exercise);
+                      }
                       return next;
                     })
                   }
@@ -229,22 +211,14 @@ export function ActiveWorkout({
                 <div className="flex-1">
                   <span
                     className={`font-mono text-xs ${
-                      warmupsDone.has(ex.exercise)
-                        ? "text-text-muted line-through"
-                        : "text-text"
+                      warmupsDone.has(ex.exercise) ? "text-text-muted line-through" : "text-text"
                     }`}
                   >
                     {ex.exercise}
                   </span>
-                  <span className="type-micro text-text-muted ml-2">
-                    {ex.reps}
-                  </span>
+                  <span className="type-micro text-text-muted ml-2">{ex.reps}</span>
                 </div>
-                {ex.notes && (
-                  <span className="type-micro text-text-muted">
-                    {ex.notes}
-                  </span>
-                )}
+                {ex.notes && <span className="type-micro text-text-muted">{ex.notes}</span>}
               </div>
             ))}
           </div>
@@ -271,11 +245,7 @@ export function ActiveWorkout({
                       {ex.exercise}
                     </span>
                   </div>
-                  {ex.notes && (
-                    <p className="type-micro text-text-muted mt-0.5">
-                      {ex.notes}
-                    </p>
-                  )}
+                  {ex.notes && <p className="type-micro text-text-muted mt-0.5">{ex.notes}</p>}
                 </div>
                 <div className="text-right">
                   <span className="type-micro text-text-muted">
@@ -289,13 +259,9 @@ export function ActiveWorkout({
                 {sets.map((s, idx) => (
                   <div
                     key={idx}
-                    className={`flex items-center gap-2 ${
-                      s.done ? "opacity-50" : ""
-                    }`}
+                    className={`flex items-center gap-2 ${s.done ? "opacity-50" : ""}`}
                   >
-                    <span className="type-micro text-text-muted w-6">
-                      {idx + 1}
-                    </span>
+                    <span className="type-micro text-text-muted w-6">{idx + 1}</span>
 
                     {isHang ? (
                       <div className="flex items-center gap-2">
@@ -361,14 +327,7 @@ export function ActiveWorkout({
                           type="number"
                           placeholder="wt"
                           value={s.weight}
-                          onChange={(e) =>
-                            updateSet(
-                              ex.exercise,
-                              idx,
-                              "weight",
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => updateSet(ex.exercise, idx, "weight", e.target.value)}
                           disabled={s.done}
                           className="w-16 bg-bg-input border border-border rounded px-2 py-1.5 font-mono text-xs text-text focus:border-gold-dim focus:outline-none disabled:opacity-30"
                         />
@@ -376,14 +335,7 @@ export function ActiveWorkout({
                           type="number"
                           placeholder="reps"
                           value={s.reps}
-                          onChange={(e) =>
-                            updateSet(
-                              ex.exercise,
-                              idx,
-                              "reps",
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => updateSet(ex.exercise, idx, "reps", e.target.value)}
                           disabled={s.done}
                           className="w-14 bg-bg-input border border-border rounded px-2 py-1.5 font-mono text-xs text-text focus:border-gold-dim focus:outline-none disabled:opacity-30"
                         />
@@ -391,14 +343,7 @@ export function ActiveWorkout({
                           type="number"
                           placeholder="RPE"
                           value={s.rpe}
-                          onChange={(e) =>
-                            updateSet(
-                              ex.exercise,
-                              idx,
-                              "rpe",
-                              e.target.value
-                            )
-                          }
+                          onChange={(e) => updateSet(ex.exercise, idx, "rpe", e.target.value)}
                           disabled={s.done}
                           step="0.5"
                           className="w-14 bg-bg-input border border-border rounded px-2 py-1.5 font-mono text-xs text-text focus:border-gold-dim focus:outline-none disabled:opacity-30"
@@ -408,24 +353,14 @@ export function ActiveWorkout({
 
                     {!s.done && !isHang && (
                       <button
-                        onClick={() =>
-                          completeSet(
-                            ex.exercise,
-                            idx,
-                            ex.rest_seconds ?? 60
-                          )
-                        }
+                        onClick={() => completeSet(ex.exercise, idx, ex.rest_seconds ?? 60)}
                         className="type-micro px-2 py-1.5 rounded bg-bg-elevated hover:bg-gold-muted text-gold-dim hover:text-gold transition-colors"
                       >
                         ✓
                       </button>
                     )}
 
-                    {s.done && (
-                      <span className="type-micro text-success">
-                        ✓
-                      </span>
-                    )}
+                    {s.done && <span className="type-micro text-success">✓</span>}
                   </div>
                 ))}
               </div>

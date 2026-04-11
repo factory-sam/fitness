@@ -33,16 +33,12 @@ export default async function BodyPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="card text-center">
           <p className="metric-label">Weight</p>
-          <p className="metric-value text-xl">
-            {latestComp?.weight_lbs ?? "—"}
-          </p>
+          <p className="metric-value text-xl">{latestComp?.weight_lbs ?? "—"}</p>
           <p className="type-micro text-text-muted">lbs</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">Body Fat</p>
-          <p className="metric-value text-xl">
-            {latestComp?.body_fat_pct ?? "—"}%
-          </p>
+          <p className="metric-value text-xl">{latestComp?.body_fat_pct ?? "—"}%</p>
           <p className="type-micro text-text-muted">target: 12-18%</p>
         </div>
         <div className="card text-center">
@@ -52,9 +48,7 @@ export default async function BodyPage() {
         </div>
         <div className="card text-center">
           <p className="metric-label">VO₂ Max</p>
-          <p className="metric-value text-xl">
-            {latestComp?.vo2_max ?? "—"}
-          </p>
+          <p className="metric-value text-xl">{latestComp?.vo2_max ?? "—"}</p>
         </div>
       </div>
 

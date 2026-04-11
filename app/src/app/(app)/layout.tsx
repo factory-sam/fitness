@@ -1,10 +1,6 @@
 import { Nav } from "../../components/ui/nav";
 
-export default function AppLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <div className="flex min-h-screen">

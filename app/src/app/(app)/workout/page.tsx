@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { WorkoutSelector } from "../../../components/workout/workout-selector";
 import { ActiveWorkout } from "../../../components/workout/active-workout";
 import { WorkoutSummary } from "../../../components/workout/workout-summary";
@@ -106,12 +106,7 @@ export default function WorkoutPage() {
   }
 
   if (phase === "active" && selectedDay) {
-    return (
-      <ActiveWorkout
-        day={selectedDay}
-        onFinish={handleFinish}
-      />
-    );
+    return <ActiveWorkout day={selectedDay} onFinish={handleFinish} />;
   }
 
   if (phase === "summary") {

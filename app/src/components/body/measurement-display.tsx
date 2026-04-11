@@ -23,7 +23,7 @@ const bodyParts = [
 
 export function MeasurementDisplay({
   latest,
-  history,
+  history: _history,
   swRatio,
 }: {
   latest?: MeasurementData;
@@ -41,9 +41,7 @@ export function MeasurementDisplay({
 
       <div className="mb-6">
         <VitruvianMan
-          onRegionClick={(region) =>
-            setSelectedRegion(selectedRegion === region ? null : region)
-          }
+          onRegionClick={(region) => setSelectedRegion(selectedRegion === region ? null : region)}
           onRegionHover={setHoveredRegion}
           highlightedRegion={activeRegion ?? undefined}
           measurements={{
@@ -80,7 +78,9 @@ export function MeasurementDisplay({
                 style={{ cursor: "pointer" }}
               >
                 <td className={isHighlighted ? "!text-white" : ""}>{part.label}</td>
-                <td className={isHighlighted ? "!text-white font-semibold" : "text-text"}>{value ? `${value}"` : "—"}</td>
+                <td className={isHighlighted ? "!text-white font-semibold" : "text-text"}>
+                  {value ? `${value}"` : "—"}
+                </td>
                 <td className="text-text-muted">{latest?.date ?? "—"}</td>
               </tr>
             );

@@ -20,15 +20,10 @@ export function ExerciseList({
   const loggedMap = new Map(loggedExercises.map((e) => [e.exercise, e]));
 
   const allExercises = [
-    ...new Set([
-      ...programmeExercises,
-      ...loggedExercises.map((e) => e.exercise),
-    ]),
+    ...new Set([...programmeExercises, ...loggedExercises.map((e) => e.exercise)]),
   ].sort();
 
-  const filtered = allExercises.filter((e) =>
-    e.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = allExercises.filter((e) => e.toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div>
@@ -78,9 +73,7 @@ export function ExerciseList({
                       </span>
                     )}
                     {!inProgramme && !logged && (
-                      <span className="type-micro text-text-muted">
-                        —
-                      </span>
+                      <span className="type-micro text-text-muted">—</span>
                     )}
                   </td>
                 </tr>

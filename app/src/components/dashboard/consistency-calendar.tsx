@@ -18,7 +18,7 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
     cells.push({ date: dateStr, isWorkout, isToday });
   }
 
-  const grid: typeof cells[] = [];
+  const grid: (typeof cells)[] = [];
   for (let i = 0; i < 7; i++) {
     grid.push([]);
   }
@@ -34,14 +34,9 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
         {/* Day-of-week labels */}
         <div className="flex flex-col gap-[3px] mr-1">
           {DAY_LABELS.map((label, i) => (
-            <div
-              key={i}
-              className="h-[10px] flex items-center"
-            >
+            <div key={i} className="h-[10px] flex items-center">
               {i % 2 === 1 && (
-                <span className="type-micro text-text-muted leading-none text-[9px]">
-                  {label}
-                </span>
+                <span className="type-micro text-text-muted leading-none text-[9px]">{label}</span>
               )}
             </div>
           ))}
@@ -58,8 +53,8 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
                     cell.isWorkout
                       ? "bg-gold"
                       : cell.isToday
-                      ? "border border-gold-dim bg-bg-elevated"
-                      : "bg-bg-elevated"
+                        ? "border border-gold-dim bg-bg-elevated"
+                        : "bg-bg-elevated"
                   }`}
                   title={`${cell.date}${cell.isWorkout ? " — workout" : ""}`}
                 />
@@ -68,9 +63,7 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
           </div>
         ))}
       </div>
-      <p className="type-micro text-text-muted mt-2">
-        Last 12 weeks
-      </p>
+      <p className="type-micro text-text-muted mt-2">Last 12 weeks</p>
     </div>
   );
 }

@@ -23,10 +23,7 @@ export function WorkoutSummary({
     exercises.get(s.exercise)!.push(s);
   }
 
-  const totalVolume = sets.reduce(
-    (sum, s) => sum + (s.reps ?? 0) * (s.weight ?? 0),
-    0
-  );
+  const totalVolume = sets.reduce((sum, s) => sum + (s.reps ?? 0) * (s.weight ?? 0), 0);
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
@@ -47,9 +44,7 @@ export function WorkoutSummary({
           <p className="metric-value text-lg">
             {totalVolume > 0 ? totalVolume.toLocaleString() : "—"}
           </p>
-          {totalVolume > 0 && (
-            <p className="type-micro text-text-muted">lbs</p>
-          )}
+          {totalVolume > 0 && <p className="type-micro text-text-muted">lbs</p>}
         </div>
       </div>
 
@@ -67,7 +62,7 @@ export function WorkoutSummary({
           <tbody>
             {Array.from(exercises.entries()).map(([name, exSets]) => {
               const bestSet = exSets.reduce((best, s) =>
-                (s.weight ?? 0) > (best.weight ?? 0) ? s : best
+                (s.weight ?? 0) > (best.weight ?? 0) ? s : best,
               );
               const avgRpe =
                 exSets.filter((s) => s.rpe).length > 0
@@ -85,8 +80,8 @@ export function WorkoutSummary({
                     {bestSet.weight
                       ? `${bestSet.weight} lbs × ${bestSet.reps}`
                       : bestSet.duration_sec
-                      ? `${bestSet.duration_sec}s`
-                      : "BW"}
+                        ? `${bestSet.duration_sec}s`
+                        : "BW"}
                   </td>
                   <td>{avgRpe}</td>
                 </tr>

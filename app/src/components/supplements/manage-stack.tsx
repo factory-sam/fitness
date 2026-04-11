@@ -72,7 +72,14 @@ export function ManageStack({
   });
 
   const resetForm = () => {
-    setForm({ name: "", amount: "", units: "g", time_of_day: "morning", frequency: "daily", notes: "" });
+    setForm({
+      name: "",
+      amount: "",
+      units: "g",
+      time_of_day: "morning",
+      frequency: "daily",
+      notes: "",
+    });
     setShowAddForm(false);
     setEditingId(null);
   };
@@ -116,7 +123,8 @@ export function ManageStack({
       >
         <h2 className="section-heading">Manage Stack</h2>
         <span className="font-mono text-xs text-text-muted">
-          {expanded ? "▲" : "▼"} {supplements.length} supplement{supplements.length !== 1 ? "s" : ""}
+          {expanded ? "▲" : "▼"} {supplements.length} supplement
+          {supplements.length !== 1 ? "s" : ""}
         </span>
       </button>
 
@@ -132,10 +140,8 @@ export function ManageStack({
               }`}
             >
               <div className="flex-1 min-w-0">
-                <span className="font-mono text-sm text-text truncate block">
-                  {supp.name}
-                </span>
-                {(supp.amount != null) && (
+                <span className="font-mono text-sm text-text truncate block">{supp.name}</span>
+                {supp.amount != null && (
                   <span className="font-mono text-xs text-text-muted ml-2">
                     {formatDosage(supp.amount, supp.units)}
                   </span>
@@ -154,9 +160,7 @@ export function ManageStack({
               <button
                 onClick={() => onUpdate(supp.id, { active: supp.active ? 0 : 1 })}
                 className={`type-micro px-2 py-1 transition-colors ${
-                  supp.active
-                    ? "text-text-muted hover:text-error"
-                    : "text-success hover:text-gold"
+                  supp.active ? "text-text-muted hover:text-error" : "text-success hover:text-gold"
                 }`}
               >
                 {supp.active ? "PAUSE" : "RESUME"}

@@ -9,11 +9,7 @@ interface Day {
   focus: string;
 }
 
-export function WorkoutSelector({
-  onSelect,
-}: {
-  onSelect: (dayNumber: number) => void;
-}) {
+export function WorkoutSelector({ onSelect }: { onSelect: (dayNumber: number) => void }) {
   const [days, setDays] = useState<Day[]>([]);
 
   useEffect(() => {
@@ -39,16 +35,10 @@ export function WorkoutSelector({
             <div className="flex items-center justify-between">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs text-gold-dim">
-                    Day {day.day_number}
-                  </span>
-                  <span className="font-mono text-sm text-text font-medium">
-                    {day.day_name}
-                  </span>
+                  <span className="font-mono text-xs text-gold-dim">Day {day.day_number}</span>
+                  <span className="font-mono text-sm text-text font-medium">{day.day_name}</span>
                 </div>
-                <p className="font-mono text-xs text-text-muted">
-                  {day.focus}
-                </p>
+                <p className="font-mono text-xs text-text-muted">{day.focus}</p>
               </div>
               <span className="text-text-muted group-hover:text-gold transition-colors text-lg">
                 →
@@ -60,9 +50,7 @@ export function WorkoutSelector({
 
       {days.length === 0 && (
         <div className="card text-center py-12">
-          <p className="font-mono text-sm text-text-secondary">
-            Loading programme...
-          </p>
+          <p className="font-mono text-sm text-text-secondary">Loading programme...</p>
         </div>
       )}
     </div>

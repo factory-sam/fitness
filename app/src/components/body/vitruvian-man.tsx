@@ -17,7 +17,12 @@ interface VitruvianManProps {
   measurements?: Measurements;
 }
 
-export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, measurements }: VitruvianManProps) {
+export function VitruvianMan({
+  onRegionClick,
+  onRegionHover,
+  highlightedRegion,
+  measurements,
+}: VitruvianManProps) {
   const [hovered, setHovered] = useState<string | null>(null);
 
   const handleHover = (region: string | null) => {
@@ -121,7 +126,6 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
               </g>
             );
           })}
-
         </svg>
 
         {/* Clickable regions */}
@@ -136,12 +140,8 @@ export function VitruvianMan({ onRegionClick, onRegionHover, highlightedRegion, 
                 left: region.left,
                 width: region.width,
                 height: region.height,
-                backgroundColor: isActive
-                  ? "rgba(201, 168, 76, 0.1)"
-                  : "transparent",
-                borderColor: isActive
-                  ? "rgba(201, 168, 76, 0.3)"
-                  : "transparent",
+                backgroundColor: isActive ? "rgba(201, 168, 76, 0.1)" : "transparent",
+                borderColor: isActive ? "rgba(201, 168, 76, 0.3)" : "transparent",
               }}
               onMouseEnter={() => handleHover(region.id)}
               onMouseLeave={() => handleHover(null)}

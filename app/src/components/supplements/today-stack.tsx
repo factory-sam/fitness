@@ -34,9 +34,7 @@ export function TodayStack({
   todayLog: LogEntry[];
   onToggle: (supplementId: number, taken: boolean) => void;
 }) {
-  const takenIds = new Set(
-    todayLog.filter((l) => l.taken === 1).map((l) => l.supplement_id)
-  );
+  const takenIds = new Set(todayLog.filter((l) => l.taken === 1).map((l) => l.supplement_id));
 
   const grouped = TIME_ORDER.map((time) => ({
     time,
@@ -76,9 +74,7 @@ export function TodayStack({
         <div key={group.time}>
           <div className="flex items-center gap-2 mb-2">
             <div className="h-px flex-1 bg-border-subtle" />
-            <span className="type-label text-text-muted">
-              {group.label}
-            </span>
+            <span className="type-label text-text-muted">{group.label}</span>
             <div className="h-px flex-1 bg-border-subtle" />
           </div>
           <div className="space-y-1">
@@ -102,11 +98,7 @@ export function TodayStack({
                     }`}
                   >
                     {taken && (
-                      <svg
-                        viewBox="0 0 16 16"
-                        className="w-3 h-3"
-                        fill="currentColor"
-                      >
+                      <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor">
                         <path d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z" />
                       </svg>
                     )}
@@ -120,7 +112,8 @@ export function TodayStack({
                   </span>
                   {supp.amount != null && (
                     <span className="font-mono text-xs text-text-muted">
-                      {supp.amount}{supp.units ?? ""}
+                      {supp.amount}
+                      {supp.units ?? ""}
                     </span>
                   )}
                 </button>

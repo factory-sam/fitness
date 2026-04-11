@@ -242,16 +242,30 @@ body {
 }
 
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 
 /* Gold gradient for heatmaps */
-.gold-gradient-1 { background-color: #1a1508; }
-.gold-gradient-2 { background-color: #2d2410; }
-.gold-gradient-3 { background-color: #4a3d1a; }
-.gold-gradient-4 { background-color: #6b5a25; }
-.gold-gradient-5 { background-color: #8b7335; }
-.gold-gradient-6 { background-color: #c9a84c; }
+.gold-gradient-1 {
+  background-color: #1a1508;
+}
+.gold-gradient-2 {
+  background-color: #2d2410;
+}
+.gold-gradient-3 {
+  background-color: #4a3d1a;
+}
+.gold-gradient-4 {
+  background-color: #6b5a25;
+}
+.gold-gradient-5 {
+  background-color: #8b7335;
+}
+.gold-gradient-6 {
+  background-color: #c9a84c;
+}
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
@@ -300,7 +314,9 @@ body {
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -308,6 +324,12 @@ body {
 }
 
 /* RPE color coding */
-.rpe-low { color: var(--color-success); }
-.rpe-mid { color: var(--color-gold); }
-.rpe-high { color: var(--color-error); }
+.rpe-low {
+  color: var(--color-success);
+}
+.rpe-mid {
+  color: var(--color-gold);
+}
+.rpe-high {
+  color: var(--color-error);
+}

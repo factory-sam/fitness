@@ -42,20 +42,14 @@ export function ProgrammeDayCard({
         className="w-full text-left flex items-center justify-between gap-4 cursor-pointer"
       >
         <div className="flex items-center gap-4 min-w-0">
-          <span className="font-mono text-xs text-gold-dim shrink-0">
-            Day {dayNumber}
-          </span>
+          <span className="font-mono text-xs text-gold-dim shrink-0">Day {dayNumber}</span>
           <div className="min-w-0">
-            <h3 className="font-mono text-sm text-text font-medium">
-              {dayName}
-            </h3>
+            <h3 className="font-mono text-sm text-text font-medium">{dayName}</h3>
             <p className="type-micro text-text-muted">{focus}</p>
           </div>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <span className="type-micro text-text-muted">
-            {working.length} exercises
-          </span>
+          <span className="type-micro text-text-muted">{working.length} exercises</span>
           <span
             className={`text-text-muted transition-transform duration-200 text-xs ${
               open ? "rotate-90" : ""
@@ -81,10 +75,7 @@ export function ProgrammeDayCard({
             <tbody>
               {warmups.length > 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="type-label text-text-muted pt-2"
-                  >
+                  <td colSpan={5} className="type-label text-text-muted pt-2">
                     Warm-Up
                   </td>
                 </tr>
@@ -100,10 +91,7 @@ export function ProgrammeDayCard({
               ))}
               {working.length > 0 && warmups.length > 0 && (
                 <tr>
-                  <td
-                    colSpan={5}
-                    className="type-label text-text-muted pt-2"
-                  >
+                  <td colSpan={5} className="type-label text-text-muted pt-2">
                     Working Sets
                   </td>
                 </tr>
@@ -118,9 +106,7 @@ export function ProgrammeDayCard({
                     )}
                   </td>
                   <td className="text-text">{ex.exercise}</td>
-                  <td>
-                    {ex.sets ? `${ex.sets}x${ex.reps}` : ex.reps}
-                  </td>
+                  <td>{ex.sets ? `${ex.sets}x${ex.reps}` : ex.reps}</td>
                   <td>{ex.target_rpe ?? "--"}</td>
                   <td>{ex.rest_seconds ? `${ex.rest_seconds}s` : "--"}</td>
                 </tr>

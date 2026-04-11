@@ -43,8 +43,8 @@ export default function SignUpPage() {
           <div className="card text-center space-y-3">
             <h2 className="section-heading">Check your email</h2>
             <p className="type-secondary text-text-secondary">
-              We sent a confirmation link to <span className="text-text">{email}</span>.
-              Click it to activate your account.
+              We sent a confirmation link to <span className="text-text">{email}</span>. Click it to
+              activate your account.
             </p>
             <Link
               href="/login"
@@ -64,7 +64,9 @@ export default function SignUpPage() {
             )}
 
             <div className="space-y-1">
-              <label htmlFor="email" className="type-label">Email</label>
+              <label htmlFor="email" className="type-label">
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
@@ -77,7 +79,9 @@ export default function SignUpPage() {
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="password" className="type-label">Password</label>
+              <label htmlFor="password" className="type-label">
+                Password
+              </label>
               <input
                 id="password"
                 type="password"
