@@ -27,13 +27,23 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  await logSupplementIntake({
-    supplement_id: body.supplement_id,
-    date: body.date ?? getLocalDateString(),
-    taken: body.taken === 1 || body.taken === true,
-    time_taken: body.time_taken,
-    notes: body.notes,
-  });
-  return Response.json({ ok: true }, { status: 201 });
+  try {
+    const body = await request.json();
+    if (!body || typeof body !== "object" || !body.supplement_id) {
+      return Response.json({ error: "Missing required field: supplement_id" }, { status: 400 });
+    }
+    await logSupplementIntake({
+      supplement_id: body.supplement_id,
+      date: body.date ?? getLocalDateString(),
+      taken: body.taken === 1 || body.taken === true,
+      time_taken: body.time_taken,
+      notes: body.notes,
+    });
+    return Response.json({ ok: true }, { status: 201 });
+  } catch (err) {
+    if (err instanceof SyntaxError) {
+      return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    return Response.json({ error: "Failed to log supplement intake" }, { status: 500 });
+  }
 }
