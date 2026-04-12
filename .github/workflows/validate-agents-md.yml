@@ -46,8 +46,10 @@ jobs:
       - name: Run tests with timing
         run: |
           TEST_START=$(date +%s%N)
+          set +eo pipefail
           pnpm test 2>&1 | tee test-output.log
           TEST_EXIT=${PIPESTATUS[0]}
+          set -eo pipefail
           TEST_END=$(date +%s%N)
           TEST_MS=$(( (TEST_END - TEST_START) / 1000000 ))
 
@@ -80,8 +82,9 @@ jobs:
               let flaky = [];
               for (const suite of suites) {
                 for (const test of (suite.assertionResults || [])) {
-                  if (test.retryReasons && test.retryReasons.length > 0) {
-                    flaky.push({ name: test.fullName || test.title, retries: test.retryReasons.length });
+                  const retries = test.retryReasons?.length || test.retry || 0;
+                  if (retries > 0 && test.status === 'passed') {
+                    flaky.push({ name: test.fullName || test.title, retries });
                   }
                 }
               }

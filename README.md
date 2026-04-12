@@ -55,8 +55,8 @@ docker compose up -d          # starts Postgres on port 54322 + Studio on 54323
 ```
 
 The schema in `app/supabase/schema.sql` is automatically applied on first start.
-Point your `.env.local` at `http://localhost:54321` when using local Supabase, or
-connect directly to Postgres on port `54322` (user: `postgres`, password: `postgres`).
+Connect directly to Postgres on port `54322` (user: `postgres`, password: `postgres`).
+Studio is available at `http://localhost:54323` for browsing tables.
 
 ### Dev Container
 

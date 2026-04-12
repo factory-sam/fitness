@@ -42,5 +42,6 @@ export async function getFeatureFlagPayload(
   distinctId: string,
 ): Promise<string | boolean | undefined> {
   const posthog = getPostHogClient();
-  return posthog.getFeatureFlag(flag, distinctId) ?? undefined;
+  const value = await posthog.getFeatureFlag(flag, distinctId);
+  return value ?? undefined;
 }
