@@ -103,22 +103,6 @@ jobs:
       - name: Check knip
         run: pnpm knip || true
 
-      - name: Build with timing
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
-          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
-        run: |
-          BUILD_START=$(date +%s)
-          pnpm build
-          BUILD_END=$(date +%s)
-          BUILD_DURATION=$((BUILD_END - BUILD_START))
-          echo "### Build Performance" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Build duration | ${BUILD_DURATION}s |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| Node version | $(node -v) |" >> "$GITHUB_STEP_SUMMARY"
-          echo "| pnpm version | $(pnpm -v) |" >> "$GITHUB_STEP_SUMMARY"
-
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
