@@ -1,25 +1,26 @@
-const milestones: { label: string; status: "active" | "complete" | "upcoming"; detail: string }[] = [
-  {
-    label: "Dead Hangs + Lat Pulldowns",
-    status: "active" as const,
-    detail: "Block 1 — Building grip & lat strength",
-  },
-  {
-    label: "Band-Assisted Negatives",
-    status: "upcoming" as const,
-    detail: "Block 2 — 3-5 sec eccentrics",
-  },
-  {
-    label: "Band-Assisted Pull-Ups",
-    status: "upcoming" as const,
-    detail: "Block 3 — Full reps with band",
-  },
-  {
-    label: "Unassisted Pull-Up",
-    status: "upcoming" as const,
-    detail: "Goal — Test at Week 12",
-  },
-];
+const milestones: { label: string; status: "active" | "complete" | "upcoming"; detail: string }[] =
+  [
+    {
+      label: "Dead Hangs + Lat Pulldowns",
+      status: "active" as const,
+      detail: "Block 1 — Building grip & lat strength",
+    },
+    {
+      label: "Band-Assisted Negatives",
+      status: "upcoming" as const,
+      detail: "Block 2 — 3-5 sec eccentrics",
+    },
+    {
+      label: "Band-Assisted Pull-Ups",
+      status: "upcoming" as const,
+      detail: "Block 3 — Full reps with band",
+    },
+    {
+      label: "Unassisted Pull-Up",
+      status: "upcoming" as const,
+      detail: "Goal — Test at Week 12",
+    },
+  ];
 
 export function PullUpTimeline() {
   return (
@@ -34,8 +35,8 @@ export function PullUpTimeline() {
                   m.status === "active"
                     ? "bg-gold shadow-[0_0_6px_rgba(201,168,76,0.4)]"
                     : m.status === "complete"
-                    ? "bg-success"
-                    : "bg-border"
+                      ? "bg-success"
+                      : "bg-border"
                 }`}
               />
               {i < milestones.length - 1 && (
@@ -56,9 +57,7 @@ export function PullUpTimeline() {
               >
                 {m.label}
               </p>
-              <p className="type-micro text-text-muted">
-                {m.detail}
-              </p>
+              <p className="type-micro text-text-muted">{m.detail}</p>
             </div>
           </div>
         ))}

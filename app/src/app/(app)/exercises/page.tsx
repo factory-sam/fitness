@@ -15,7 +15,10 @@ export default async function ExercisesPage() {
     .order("exercise");
 
   // Aggregate in JS
-  const exerciseMap = new Map<string, { exercise: string; count: number; max_weight: number | null; last_date: string }>();
+  const exerciseMap = new Map<
+    string,
+    { exercise: string; count: number; max_weight: number | null; last_date: string }
+  >();
   for (const row of loggedRaw ?? []) {
     const session = row.sessions as unknown as { date: string };
     const existing = exerciseMap.get(row.exercise);
@@ -56,10 +59,7 @@ export default async function ExercisesPage() {
         </p>
       </header>
 
-      <ExerciseList
-        programmeExercises={programmeExercises}
-        loggedExercises={loggedExercises}
-      />
+      <ExerciseList programmeExercises={programmeExercises} loggedExercises={loggedExercises} />
     </div>
   );
 }

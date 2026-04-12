@@ -1,10 +1,7 @@
 import { getSession } from "../../../../../lib/queries";
 import type { NextRequest } from "next/server";
 
-export async function GET(
-  _req: NextRequest,
-  ctx: RouteContext<"/api/sessions/[id]">
-) {
+export async function GET(_req: NextRequest, ctx: RouteContext<"/api/sessions/[id]">) {
   const { id } = await ctx.params;
   const session = await getSession(parseInt(id));
   if (!session) {

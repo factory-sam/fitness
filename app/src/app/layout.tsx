@@ -6,16 +6,10 @@ export const metadata: Metadata = {
   description: "Personal fitness dashboard & workout logger",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
-      <body className="min-h-screen bg-bg">
-        {children}
-      </body>
+      <body className="min-h-screen bg-bg">{children}</body>
     </html>
   );
 }

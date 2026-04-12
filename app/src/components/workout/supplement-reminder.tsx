@@ -14,25 +14,31 @@ export function SupplementReminder() {
   const [dismissed, setDismissed] = useState(false);
 
   const fetchUntaken = async () => {
-    try {
-      const today = new Date().toISOString().split("T")[0];
-      const [suppsRes, logRes] = await Promise.all([
-        fetch("/api/supplements"),
-        fetch(`/api/supplements/log?date=${today}`),
-      ]);
-      const supps = await suppsRes.json();
-      const log = await logRes.json();
-      const takenIds = new Set(
-        log.filter((l: { taken: number }) => l.taken === 1).map((l: { supplement_id: number }) => l.supplement_id)
-      );
-      setUntaken(supps.filter((s: UntakenSupplement) => !takenIds.has(s.id)));
-    } catch {
-      // silently fail
-    }
+    const today = new Date().toISOString().split("T")[0];
+    const [suppsRes, logRes] = await Promise.all([
+      fetch("/api/supplements"),
+      fetch(`/api/supplements/log?date=${today}`),
+    ]);
+    const supps = await suppsRes.json();
+    const log = await logRes.json();
+    const takenIds = new Set(
+      log
+        .filter((l: { taken: number }) => l.taken === 1)
+        .map((l: { supplement_id: number }) => l.supplement_id),
+    );
+    return supps.filter((s: UntakenSupplement) => !takenIds.has(s.id));
   };
 
   useEffect(() => {
-    fetchUntaken();
+    let cancelled = false;
+    fetchUntaken()
+      .then((result) => {
+        if (!cancelled) setUntaken(result);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleQuickTake = async (id: number) => {
@@ -47,7 +53,9 @@ export function SupplementReminder() {
         time_taken: new Date().toTimeString().slice(0, 5),
       }),
     });
-    fetchUntaken();
+    fetchUntaken()
+      .then(setUntaken)
+      .catch(() => {});
   };
 
   if (dismissed || untaken.length === 0) return null;

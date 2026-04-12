@@ -30,16 +30,10 @@ export function PRBoard({ prs }: { prs: PR[] }) {
             key={i}
             className="flex items-center justify-between py-1.5 border-b border-border-subtle last:border-0"
           >
-            <span className="font-mono text-xs text-text">
-              {pr.exercise}
-            </span>
+            <span className="font-mono text-xs text-text">{pr.exercise}</span>
             <div className="flex items-baseline gap-1">
-              <span className="font-mono text-sm font-semibold text-text">
-                {pr.max_weight}
-              </span>
-              <span className="type-micro text-text-muted">
-                {pr.weight_unit}
-              </span>
+              <span className="font-mono text-sm font-semibold text-text">{pr.max_weight}</span>
+              <span className="type-micro text-text-muted">{pr.weight_unit}</span>
             </div>
           </div>
         ))}

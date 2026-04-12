@@ -24,7 +24,7 @@ export default async function Dashboard() {
   const streak = await getWorkoutStreak();
   const prs = await getPersonalRecords();
   const untakenSupps = await getUntakenSupplementsToday();
-  const programmeDays = await getProgrammeDays() as { day_name: string; focus: string }[];
+  const programmeDays = (await getProgrammeDays()) as { day_name: string; focus: string }[];
 
   const swRatio =
     measurements?.shoulders && measurements?.waist

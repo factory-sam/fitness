@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 
-export function RestTimer({
-  seconds,
-  onComplete,
-}: {
-  seconds: number;
-  onComplete: () => void;
-}) {
+export function RestTimer({ seconds, onComplete }: { seconds: number; onComplete: () => void }) {
   const [remaining, setRemaining] = useState(seconds);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -38,14 +32,7 @@ export function RestTimer({
   return (
     <div className="flex flex-col items-center gap-3 py-4">
       <svg width="100" height="100" className="-rotate-90">
-        <circle
-          cx="50"
-          cy="50"
-          r="40"
-          fill="none"
-          stroke="#1e1e1e"
-          strokeWidth="4"
-        />
+        <circle cx="50" cy="50" r="40" fill="none" stroke="#1e1e1e" strokeWidth="4" />
         <circle
           cx="50"
           cy="50"

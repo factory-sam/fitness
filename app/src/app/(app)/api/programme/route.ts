@@ -30,9 +30,6 @@ export async function GET(request: Request) {
     });
   }
 
-  const { data: days } = await supabase
-    .from("programme_days")
-    .select("*")
-    .order("day_number");
+  const { data: days } = await supabase.from("programme_days").select("*").order("day_number");
   return Response.json(days ?? []);
 }

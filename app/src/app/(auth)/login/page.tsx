@@ -45,7 +45,9 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-1">
-            <label htmlFor="email" className="type-label">Email</label>
+            <label htmlFor="email" className="type-label">
+              Email
+            </label>
             <input
               id="email"
               type="email"
@@ -58,7 +60,9 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <label htmlFor="password" className="type-label">Password</label>
+            <label htmlFor="password" className="type-label">
+              Password
+            </label>
             <input
               id="password"
               type="password"

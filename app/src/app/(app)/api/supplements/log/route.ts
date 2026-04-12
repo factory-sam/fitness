@@ -1,4 +1,8 @@
-import { logSupplementIntake, getSupplementLogForDate, getSupplementLogRange } from "../../../../../lib/queries";
+import {
+  logSupplementIntake,
+  getSupplementLogForDate,
+  getSupplementLogRange,
+} from "../../../../../lib/queries";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

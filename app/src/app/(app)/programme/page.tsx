@@ -8,10 +8,7 @@ export default async function ProgrammePage() {
   const cookieStore = await cookies();
   const supabase = createClient(cookieStore);
 
-  const { data: days } = await supabase
-    .from("programme_days")
-    .select("*")
-    .order("day_number");
+  const { data: days } = await supabase.from("programme_days").select("*").order("day_number");
 
   const exercisesByDay: Record<number, Record<string, unknown>[]> = {};
   for (const day of days ?? []) {
@@ -57,9 +54,7 @@ export default async function ProgrammePage() {
             >
               {block.name.split(" — ")[0]}
             </p>
-            <p className="type-micro text-text-muted">
-              Wk {block.weeks}
-            </p>
+            <p className="type-micro text-text-muted">Wk {block.weeks}</p>
           </div>
         ))}
       </div>
@@ -72,10 +67,12 @@ export default async function ProgrammePage() {
             dayNumber={day.day_number}
             dayName={day.day_name}
             focus={day.focus ?? ""}
-            exercises={(exercisesByDay[day.id] ?? []).map((e: Record<string, unknown>) => ({
-              ...e,
-              is_warmup: e.is_warmup ? 1 : 0,
-            })) as any}
+            exercises={
+              (exercisesByDay[day.id] ?? []).map((e: Record<string, unknown>) => ({
+                ...e,
+                is_warmup: e.is_warmup ? 1 : 0,
+              })) as Parameters<typeof ProgrammeDayCard>[0]["exercises"]
+            }
             defaultOpen={i === 0}
           />
         ))}
