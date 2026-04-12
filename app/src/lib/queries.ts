@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { createClient } from "../utils/supabase/server";
+import { getLocalDateString } from "./date";
 
 async function getSupabase() {
   const cookieStore = await cookies();
@@ -364,7 +365,7 @@ export async function getSupplementStreaks() {
     .eq("active", true);
   if (!supplements) return [];
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDateString();
   const streaks: { id: number; name: string; streak: number; longest: number }[] = [];
 
   for (const supp of supplements) {
@@ -376,9 +377,9 @@ export async function getSupplementStreaks() {
       .order("date", { ascending: false });
 
     let streak = 0;
-    const checkDate = new Date(today);
+    const checkDate = new Date(today + "T00:00:00");
     for (const log of logs ?? []) {
-      const expected = checkDate.toISOString().split("T")[0];
+      const expected = getLocalDateString(checkDate);
       if (log.date === expected) {
         streak++;
         checkDate.setDate(checkDate.getDate() - 1);
@@ -416,8 +417,8 @@ export async function getSupplementStreaks() {
 
 export async function getSupplementComplianceStats(days = 30) {
   const supabase = await getSupabase();
-  const endDate = new Date().toISOString().split("T")[0];
-  const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+  const endDate = getLocalDateString();
+  const startDate = getLocalDateString(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
 
   const { data: activeSupps } = await supabase.from("supplements").select("id").eq("active", true);
   const totalActive = activeSupps?.length ?? 0;
@@ -448,7 +449,7 @@ export async function getSupplementComplianceStats(days = 30) {
 
 export async function getUntakenSupplementsToday() {
   const supabase = await getSupabase();
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDateString();
 
   const { data: takenIds } = await supabase
     .from("supplement_log")

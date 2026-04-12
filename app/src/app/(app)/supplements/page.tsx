@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getLocalDateString } from "../../../lib/date";
 import { TodayStack } from "../../../components/supplements/today-stack";
 import { ComplianceChart } from "../../../components/supplements/compliance-chart";
 import { ManageStack } from "../../../components/supplements/manage-stack";
@@ -47,7 +48,7 @@ export default function SupplementsPage() {
   const [error, setError] = useState<string | null>(null);
   const [togglingIds, setTogglingIds] = useState<Set<number>>(new Set());
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDateString();
 
   const fetchAll = useCallback(async () => {
     try {
