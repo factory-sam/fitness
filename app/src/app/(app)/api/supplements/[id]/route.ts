@@ -1,4 +1,5 @@
 import { updateSupplement } from "../../../../../lib/queries";
+import { requireAuth } from "../../../../../lib/api-auth";
 import log from "../../../../../lib/logger";
 
 const ALLOWED_FIELDS = new Set([
@@ -12,6 +13,8 @@ const ALLOWED_FIELDS = new Set([
 ]);
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const { id: rawId } = await params;
     const id = parseInt(rawId);

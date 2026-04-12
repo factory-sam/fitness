@@ -28,6 +28,7 @@ export type FlagKey = (typeof FLAGS)[keyof typeof FLAGS];
  */
 export async function isFeatureEnabled(flag: FlagKey, distinctId: string): Promise<boolean> {
   const posthog = getPostHogClient();
+  if (!posthog) return false;
   const enabled = await posthog.isFeatureEnabled(flag, distinctId);
   return enabled ?? false;
 }
@@ -42,6 +43,7 @@ export async function getFeatureFlagPayload(
   distinctId: string,
 ): Promise<string | boolean | undefined> {
   const posthog = getPostHogClient();
+  if (!posthog) return undefined;
   const value = await posthog.getFeatureFlag(flag, distinctId);
   return value ?? undefined;
 }

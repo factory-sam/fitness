@@ -1,28 +1,53 @@
-const milestones: { label: string; status: "active" | "complete" | "upcoming"; detail: string }[] =
-  [
-    {
-      label: "Dead Hangs + Lat Pulldowns",
-      status: "active" as const,
-      detail: "Block 1 — Building grip & lat strength",
-    },
-    {
-      label: "Band-Assisted Negatives",
-      status: "upcoming" as const,
-      detail: "Block 2 — 3-5 sec eccentrics",
-    },
-    {
-      label: "Band-Assisted Pull-Ups",
-      status: "upcoming" as const,
-      detail: "Block 3 — Full reps with band",
-    },
-    {
-      label: "Unassisted Pull-Up",
-      status: "upcoming" as const,
-      detail: "Goal — Test at Week 12",
-    },
-  ];
+interface PullUpTimelineProps {
+  exerciseNames?: string[];
+}
 
-export function PullUpTimeline() {
+const MILESTONES = [
+  {
+    label: "Dead Hangs + Lat Pulldowns",
+    detail: "Block 1 — Building grip & lat strength",
+    matchExercises: ["dead hang", "lat pulldown"],
+  },
+  {
+    label: "Band-Assisted Negatives",
+    detail: "Block 2 — 3-5 sec eccentrics",
+    matchExercises: ["band-assisted negative", "negative pull-up", "band negative"],
+  },
+  {
+    label: "Band-Assisted Pull-Ups",
+    detail: "Block 3 — Full reps with band",
+    matchExercises: ["band-assisted pull-up", "band pull-up"],
+  },
+  {
+    label: "Unassisted Pull-Up",
+    detail: "Goal — Test at Week 12",
+    matchExercises: ["pull-up", "pullup", "chin-up", "chinup"],
+  },
+];
+
+function deriveStatuses(exerciseNames: string[]) {
+  const lower = exerciseNames.map((n) => n.toLowerCase());
+  let lastCompleted = -1;
+  for (let i = 0; i < MILESTONES.length; i++) {
+    const hasMatch = MILESTONES[i].matchExercises.some((me) => lower.some((en) => en.includes(me)));
+    if (hasMatch) lastCompleted = i;
+  }
+
+  return MILESTONES.map((m, i) => ({
+    label: m.label,
+    detail: m.detail,
+    status: (i < lastCompleted
+      ? "complete"
+      : i === lastCompleted
+        ? "active"
+        : i === lastCompleted + 1
+          ? "active"
+          : "upcoming") as "active" | "complete" | "upcoming",
+  }));
+}
+
+export function PullUpTimeline({ exerciseNames = [] }: PullUpTimelineProps) {
+  const milestones = deriveStatuses(exerciseNames);
   return (
     <div className="card">
       <h2 className="section-heading mb-3">Pull-Up Progression</h2>

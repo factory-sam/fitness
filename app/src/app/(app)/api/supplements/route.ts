@@ -1,7 +1,10 @@
 import { getActiveSupplements, getAllSupplements, createSupplement } from "../../../../lib/queries";
+import { requireAuth } from "../../../../lib/api-auth";
 import log from "../../../../lib/logger";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   const url = new URL(request.url);
   const all = url.searchParams.get("all") === "true";
   const supplements = all ? await getAllSupplements() : await getActiveSupplements();
@@ -9,8 +12,19 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
+    if (
+      !body ||
+      typeof body !== "object" ||
+      !body.name ||
+      typeof body.name !== "string" ||
+      body.name.trim().length === 0
+    ) {
+      return Response.json({ error: "Missing required field: name" }, { status: 400 });
+    }
     const id = await createSupplement({
       name: body.name,
       amount: body.amount,

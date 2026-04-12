@@ -1,17 +1,32 @@
 import { getRecentSessions, createSession, createSet } from "../../../../lib/queries";
+import { requireAuth } from "../../../../lib/api-auth";
 import log from "../../../../lib/logger";
 import { getPostHogClient } from "../../../../lib/posthog-server";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   const url = new URL(request.url);
-  const limit = parseInt(url.searchParams.get("limit") ?? "10");
+  const parsedLimit = parseInt(url.searchParams.get("limit") ?? "10");
+  const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? Math.min(parsedLimit, 100) : 10;
   const sessions = await getRecentSessions(limit);
   return Response.json(sessions);
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
+    if (!body || typeof body !== "object") {
+      return Response.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    if (!body.date || typeof body.date !== "string") {
+      return Response.json({ error: "Missing required field: date" }, { status: 400 });
+    }
+    if (!body.name || typeof body.name !== "string") {
+      return Response.json({ error: "Missing required field: name" }, { status: 400 });
+    }
     const sessionId = await createSession({
       date: body.date,
       name: body.name,
@@ -43,7 +58,7 @@ export async function POST(request: Request) {
 
     const posthog = getPostHogClient();
     const distinctId = request.headers.get("x-posthog-distinct-id") ?? "anonymous";
-    posthog.capture({
+    posthog?.capture({
       distinctId,
       event: "session_created",
       properties: {
@@ -54,7 +69,7 @@ export async function POST(request: Request) {
         date: body.date,
       },
     });
-    await posthog.flush();
+    await posthog?.flush();
 
     return Response.json({ id: Number(sessionId) }, { status: 201 });
   } catch (err) {

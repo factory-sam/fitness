@@ -1,7 +1,10 @@
 import { getMeasurements, getLatestMeasurements, createMeasurement } from "../../../../lib/queries";
 import { getPostHogClient } from "../../../../lib/posthog-server";
+import { requireAuth } from "../../../../lib/api-auth";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   const url = new URL(request.url);
   const latest = url.searchParams.get("latest");
   if (latest === "true") {
@@ -13,6 +16,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
     if (!body || typeof body !== "object" || !body.date) {
@@ -22,7 +27,7 @@ export async function POST(request: Request) {
 
     const posthog = getPostHogClient();
     const distinctId = request.headers.get("x-posthog-distinct-id") ?? "anonymous";
-    posthog.capture({
+    posthog?.capture({
       distinctId,
       event: "measurement_recorded",
       properties: {
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
         has_body_fat: body.body_fat_pct != null,
       },
     });
-    await posthog.flush();
+    await posthog?.flush();
 
     return Response.json({ success: true }, { status: 201 });
   } catch (err) {

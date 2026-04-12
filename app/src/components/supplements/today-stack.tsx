@@ -14,7 +14,7 @@ interface Supplement {
 
 interface LogEntry {
   supplement_id: number;
-  taken: number;
+  taken: boolean;
   time_taken: string | null;
 }
 
@@ -36,7 +36,7 @@ export function TodayStack({
   todayLog: LogEntry[];
   onToggle: (supplementId: number, taken: boolean) => void;
 }) {
-  const takenIds = new Set(todayLog.filter((l) => l.taken === 1).map((l) => l.supplement_id));
+  const takenIds = new Set(todayLog.filter((l) => l.taken).map((l) => l.supplement_id));
 
   const grouped = TIME_ORDER.map((time) => ({
     time,

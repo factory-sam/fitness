@@ -49,31 +49,44 @@ export default function NotificationsPage() {
   const [saving, setSaving] = useState(false);
   const [history, setHistory] = useState<NotificationEntry[]>([]);
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   useEffect(() => {
     fetch("/api/notifications/preferences")
       .then((r) => r.json())
       .then((d) => {
         if (d.preferences) setPrefs({ ...DEFAULTS, ...d.preferences });
       })
-      .catch(() => {});
+      .catch(() => setLoadError("Failed to load preferences"));
 
     fetch("/api/notifications/history?limit=20")
       .then((r) => r.json())
       .then((d) => setHistory(d.history ?? []))
-      .catch(() => {});
+      .catch(() => setLoadError("Failed to load notification history"));
   }, []);
+
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const save = useCallback(
     async (patch: Partial<Preferences>) => {
+      const prev = prefs;
       const next = { ...prefs, ...patch };
       setPrefs(next);
       setSaving(true);
+      setSaveError(null);
       try {
-        await fetch("/api/notifications/preferences", {
+        const res = await fetch("/api/notifications/preferences", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(patch),
         });
+        if (!res.ok) {
+          setPrefs(prev);
+          setSaveError("Failed to save preferences");
+        }
+      } catch {
+        setPrefs(prev);
+        setSaveError("Network error — preferences not saved");
       } finally {
         setSaving(false);
       }
@@ -83,12 +96,19 @@ export default function NotificationsPage() {
 
   async function handleClick(entry: NotificationEntry) {
     if (!entry.clicked) {
-      await fetch("/api/notifications/clicked", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: entry.id }),
-      });
       setHistory((h) => h.map((n) => (n.id === entry.id ? { ...n, clicked: true } : n)));
+      try {
+        const res = await fetch("/api/notifications/clicked", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ notificationId: entry.id }),
+        });
+        if (!res.ok) {
+          setHistory((h) => h.map((n) => (n.id === entry.id ? { ...n, clicked: false } : n)));
+        }
+      } catch {
+        setHistory((h) => h.map((n) => (n.id === entry.id ? { ...n, clicked: false } : n)));
+      }
     }
   }
 
@@ -98,6 +118,12 @@ export default function NotificationsPage() {
         <h1 className="type-heading text-text">Notifications</h1>
         {saving && <span className="type-micro text-text-muted">Saving...</span>}
       </header>
+
+      {(loadError || saveError) && (
+        <div className="mb-4 px-4 py-3 rounded border border-error/50 bg-error/10 text-error font-mono text-sm">
+          {saveError ?? loadError}
+        </div>
+      )}
 
       {/* Timezone */}
       <section className="card mb-6">

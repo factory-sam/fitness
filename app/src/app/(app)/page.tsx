@@ -78,7 +78,7 @@ export default async function Dashboard() {
         {/* Goals */}
         <div className="space-y-6">
           <PRBoard prs={prs} />
-          <PullUpTimeline />
+          <PullUpTimeline exerciseNames={prs.map((p) => p.exercise)} />
         </div>
       </div>
     </div>

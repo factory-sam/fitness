@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GOALS } from "../../lib/constants";
 
 interface HeroStatsProps {
   weight?: number;
@@ -80,12 +81,12 @@ export function HeroStats({
       <div className="flex flex-col lg:flex-row gap-8">
         {/* S/W Ratio — the primary goal */}
         <div className="flex items-center gap-6 flex-1">
-          <ProgressArc ratio={ratioNum} target={1.57} />
+          <ProgressArc ratio={ratioNum} target={GOALS.swRatioTarget} />
           <div>
             <p className="type-label text-text-muted">Shoulder-to-Waist</p>
             <p className="font-serif text-lg text-text mt-1">
               {ratioNum > 0
-                ? `${(((1.57 - ratioNum) / (1.57 - 1.0)) * 100).toFixed(0)}% to go`
+                ? `${(((GOALS.swRatioTarget - ratioNum) / (GOALS.swRatioTarget - GOALS.swRatioBaseline)) * 100).toFixed(0)}% to go`
                 : "No measurements yet"}
             </p>
             <p className="type-micro text-text-muted mt-1">
@@ -148,7 +149,7 @@ export function HeroStats({
           label="Body Fat"
           value={bodyFat?.toString() ?? "--"}
           unit="%"
-          target="12-18%"
+          target={GOALS.bodyFatRange}
         />
         <Separator />
         <MetricInline label="VO2 Max" value={vo2Max?.toString() ?? "--"} />
