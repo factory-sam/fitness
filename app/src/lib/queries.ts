@@ -488,6 +488,37 @@ export async function getUntakenSupplementsToday() {
   return (active ?? []).filter((s) => !taken.has(s.id));
 }
 
+// --- Programme Context ---
+
+export async function getCurrentProgrammeContext() {
+  const supabase = await getSupabase();
+
+  // Get programme name from programme_days (all share the same programme)
+  const { data: firstDay } = await supabase
+    .from("programme_days")
+    .select("programme")
+    .limit(1)
+    .single();
+
+  const programmeName = firstDay?.programme ?? null;
+
+  // Get latest session to determine current block/week
+  const { data: latestSession } = await supabase
+    .from("sessions")
+    .select("block, week, date")
+    .not("block", "is", null)
+    .order("date", { ascending: false })
+    .limit(1)
+    .single();
+
+  return {
+    programme: programmeName,
+    block: latestSession?.block ?? null,
+    week: latestSession?.week ?? null,
+    lastSessionDate: latestSession?.date ?? null,
+  };
+}
+
 // --- Agent Query Helpers ---
 
 export async function getSessionsWithSets(days = 30) {

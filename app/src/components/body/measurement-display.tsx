@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { VitruvianMan } from "./vitruvian-man";
+import { GOALS } from "../../lib/constants";
 
 interface MeasurementData {
   shoulders?: number;
@@ -23,11 +24,9 @@ const bodyParts = [
 
 export function MeasurementDisplay({
   latest,
-  history: _history,
   swRatio,
 }: {
   latest?: MeasurementData;
-  history: MeasurementData[];
   swRatio: string | null;
 }) {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
@@ -88,7 +87,7 @@ export function MeasurementDisplay({
           <tr>
             <td className="font-semibold">S/W Ratio</td>
             <td className="text-gold font-semibold">{swRatio ?? "—"}</td>
-            <td className="text-text-muted">Target: 1.57</td>
+            <td className="text-text-muted">Target: {GOALS.swRatioTarget}</td>
           </tr>
         </tbody>
       </table>

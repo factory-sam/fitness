@@ -1,7 +1,10 @@
 import { createClient } from "../../../../utils/supabase/server";
 import { cookies } from "next/headers";
+import { requireAuth } from "../../../../lib/api-auth";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   const url = new URL(request.url);
   const dayNumber = url.searchParams.get("day");
   const cookieStore = await cookies();

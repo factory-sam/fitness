@@ -2,9 +2,12 @@ import {
   getNotificationPreferences,
   upsertNotificationPreferences,
 } from "../../../../../lib/queries";
+import { requireAuth } from "../../../../../lib/api-auth";
 import log from "../../../../../lib/logger";
 
 export async function GET() {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const preferences = await getNotificationPreferences();
     return Response.json({ preferences });
@@ -28,6 +31,8 @@ const ALLOWED_FIELDS = new Set([
 ]);
 
 export async function PATCH(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
 

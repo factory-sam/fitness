@@ -1,7 +1,10 @@
 import { markNotificationClicked } from "../../../../../lib/queries";
+import { requireAuth } from "../../../../../lib/api-auth";
 import log from "../../../../../lib/logger";
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
 

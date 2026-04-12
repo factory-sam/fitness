@@ -24,7 +24,7 @@ export function SupplementReminder() {
     const log = await logRes.json();
     const takenIds = new Set(
       log
-        .filter((l: { taken: number }) => l.taken === 1)
+        .filter((l: { taken: boolean }) => l.taken)
         .map((l: { supplement_id: number }) => l.supplement_id),
     );
     return supps.filter((s: UntakenSupplement) => !takenIds.has(s.id));
@@ -50,7 +50,7 @@ export function SupplementReminder() {
       body: JSON.stringify({
         supplement_id: id,
         date: today,
-        taken: 1,
+        taken: true,
         time_taken: new Date().toTimeString().slice(0, 5),
       }),
     });

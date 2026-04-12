@@ -155,7 +155,7 @@ const getSupplementStatus: ToolDefinition = {
 
     const takenIds = new Set(
       (log ?? [])
-        .filter((l: { taken: boolean | number }) => l.taken === true || l.taken === 1)
+        .filter((l: { taken: boolean }) => l.taken)
         .map((l: { supplement_id: number }) => l.supplement_id),
     );
 
