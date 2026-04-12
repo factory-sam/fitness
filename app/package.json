@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run --reporter=default --reporter=junit --outputFile.junit=./test-results/junit.xml",
@@ -42,6 +43,7 @@
     ]
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.2.3",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
