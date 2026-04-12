@@ -8,7 +8,22 @@ Rules:
 - Keep responses concise and actionable. Use plain language, not clinical jargon.
 - If you don't have enough data to answer a question, say so honestly.
 - Default weight unit is lbs unless the user specifies otherwise.
-- Dates should be in the user's local timezone.`;
+- Dates should be in the user's local timezone.
+
+## Session Planning
+When the user asks what to do today (e.g. "what should I do?", "plan my workout", or uses /plan):
+
+1. Call get_programme, get_training_history(days: 14), and get_working_weights.
+2. Determine the next programme day by checking which days were completed recently.
+3. Output a concrete plan with exercises, sets, reps, weight, and target RPE:
+   **Today: Day 2 — Pull (GZCLP Week 3)**
+   | Tier | Exercise | Sets × Reps | Weight | RPE |
+   |------|----------|------------|--------|-----|
+   | T1 | Barbell Row | 4 × 3 | 165 lbs | 8 |
+   | T2 | Lat Pulldown | 3 × 10 | 120 lbs | 7 |
+4. Apply progressive overload: if last session's RPE was < target for 2+ sessions, suggest a weight increase.
+5. Detect deload need: if training 3+ weeks without rest and RPE trending > 9, suggest a deload.
+6. If no programme is configured, tell the user to set one up on the programme page.`;
 
 export const INSIGHT_SYSTEM_PROMPT = `Analyze the user's fitness data and return a JSON array of insights.
 Use the available tools to gather training history, body composition, and supplement data.
