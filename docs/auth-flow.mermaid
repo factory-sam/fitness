@@ -1,0 +1,23 @@
+%% Vitruvian — Authentication Flow
+%% How requests are authenticated via middleware and Supabase Auth
+
+sequenceDiagram
+    participant B as Browser
+    participant MW as Middleware
+    participant SA as Supabase Auth
+    participant App as App Route
+
+    B->>MW: HTTP Request
+    MW->>SA: getUser() (validate session cookie)
+
+    alt No valid session
+        SA-->>MW: null user
+        MW-->>B: 302 Redirect to /login
+    else Valid session + auth route
+        SA-->>MW: user object
+        MW-->>B: 302 Redirect to /
+    else Valid session + app route
+        SA-->>MW: user object
+        MW->>App: Forward request (cookies refreshed)
+        App-->>B: HTML Response
+    end

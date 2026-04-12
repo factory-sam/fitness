@@ -1,0 +1,37 @@
+%% Vitruvian — System Architecture
+%% Data flow from browser through Next.js to Supabase
+
+graph LR
+    subgraph Browser
+        SC[Server Components]
+        CC[Client Components]
+    end
+
+    subgraph "Next.js Server"
+        MW[Middleware<br/>src/middleware.ts]
+        QR[lib/queries.ts]
+        API[API Routes<br/>src/app/.../api/]
+        SSR[Supabase Server Client<br/>utils/supabase/server.ts]
+    end
+
+    subgraph Supabase
+        AUTH[Auth]
+        PG[(Postgres<br/>10 tables + RLS)]
+    end
+
+    SC -->|reads| QR
+    CC -->|fetch/POST| API
+    API -->|calls| QR
+    QR -->|uses| SSR
+    SSR -->|queries| PG
+    MW -->|validates session| AUTH
+    AUTH -->|auth.uid| PG
+
+    style SC fill:#1a1a1a,stroke:#c9a84c,color:#e0ddd5
+    style CC fill:#1a1a1a,stroke:#c9a84c,color:#e0ddd5
+    style MW fill:#111,stroke:#2a2a2a,color:#e0ddd5
+    style QR fill:#111,stroke:#c9a84c,color:#c9a84c
+    style API fill:#111,stroke:#2a2a2a,color:#e0ddd5
+    style SSR fill:#111,stroke:#2a2a2a,color:#e0ddd5
+    style AUTH fill:#0a0a0a,stroke:#5a8ec9,color:#5a8ec9
+    style PG fill:#0a0a0a,stroke:#4a9e6e,color:#4a9e6e
