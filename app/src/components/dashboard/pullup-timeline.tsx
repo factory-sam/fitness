@@ -29,7 +29,7 @@ function deriveStatuses(exerciseNames: string[]) {
   const lower = exerciseNames.map((n) => n.toLowerCase());
   let lastCompleted = -1;
   for (let i = 0; i < MILESTONES.length; i++) {
-    const hasMatch = MILESTONES[i].matchExercises.some((me) => lower.some((en) => en.includes(me)));
+    const hasMatch = MILESTONES[i].matchExercises.some((me) => lower.some((en) => en === me));
     if (hasMatch) lastCompleted = i;
   }
 
