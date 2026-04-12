@@ -33,10 +33,11 @@ export default async function Dashboard() {
       : null;
 
   const nextWorkoutDay = programmeDays.length > 0 ? programmeDays[0].day_name : undefined;
+  const hasSessionData = allDates.length > 0;
+  const hasPRs = prs.length > 0;
 
   return (
     <div className="p-6 pb-12 max-w-5xl mx-auto">
-      {/* Header */}
       <header className="flex items-baseline justify-between mb-8">
         <h1 className="type-heading text-text">Dashboard</h1>
         <span className="font-mono text-xs text-text-muted">
@@ -49,7 +50,6 @@ export default async function Dashboard() {
         </span>
       </header>
 
-      {/* Hero: Goal progress + today + body metrics */}
       <HeroStats
         weight={bodyComp?.weight_lbs as number | undefined}
         bodyFat={bodyComp?.body_fat_pct as number | undefined}
@@ -61,26 +61,32 @@ export default async function Dashboard() {
         nextWorkoutDay={nextWorkoutDay}
       />
 
-      {/* AI Insights */}
       <InsightCards />
 
-      {/* Divider */}
-      <div className="h-px bg-border my-8" />
+      {(hasSessionData || hasPRs) && (
+        <>
+          <div className="h-px bg-border my-8" />
 
-      {/* Two-column: Activity | Goals */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Activity */}
-        <div className="space-y-6">
-          <ConsistencyCalendar dates={allDates.map((d) => d.date)} />
-          <RecentSessions sessions={recentSessions} />
-        </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="space-y-6">
+              {hasSessionData && <ConsistencyCalendar dates={allDates.map((d) => d.date)} />}
+              <RecentSessions sessions={recentSessions} />
+            </div>
 
-        {/* Goals */}
-        <div className="space-y-6">
-          <PRBoard prs={prs} />
+            <div className="space-y-6">
+              {hasPRs && <PRBoard prs={prs} />}
+              <PullUpTimeline />
+            </div>
+          </div>
+        </>
+      )}
+
+      {!hasSessionData && !hasPRs && (
+        <>
+          <div className="h-px bg-border my-8" />
           <PullUpTimeline />
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 }
