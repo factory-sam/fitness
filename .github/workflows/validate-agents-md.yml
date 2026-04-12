@@ -104,6 +104,9 @@ jobs:
         run: pnpm knip || true
 
       - name: Build with timing
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: sb_publishable_placeholder
         run: |
           BUILD_START=$(date +%s)
           pnpm build

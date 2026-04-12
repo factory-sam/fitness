@@ -22,8 +22,8 @@ services:
     environment:
       STUDIO_PG_META_URL: http://supabase-meta:8080
       POSTGRES_PASSWORD: postgres
-      SUPABASE_URL: http://supabase-kong:8000
-      SUPABASE_REST_URL: http://supabase-kong:8000/rest/v1/
+      SUPABASE_URL: http://supabase-db:5432
+      SUPABASE_REST_URL: ""
     depends_on:
       supabase-db:
         condition: service_healthy

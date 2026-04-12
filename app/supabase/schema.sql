@@ -1,6 +1,8 @@
 -- Vitruvian database schema
--- All tables use RLS with auth.uid() = user_id policy.
--- BEFORE INSERT triggers auto-populate user_id from auth.uid().
+-- In production, all tables use RLS with auth.uid() = user_id policies and
+-- BEFORE INSERT triggers that auto-populate user_id. Those statements live in
+-- Supabase migrations and are omitted here because this file targets the local
+-- Docker Postgres instance which does not run the Supabase auth stack.
 
 -- Training sessions
 CREATE TABLE IF NOT EXISTS sessions (

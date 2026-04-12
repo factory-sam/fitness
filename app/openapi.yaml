@@ -1048,8 +1048,7 @@ components:
           type: string
           nullable: true
         active:
-          type: integer
-          description: "1 = active, 0 = inactive"
+          type: boolean
         notes:
           type: string
           nullable: true
@@ -1102,8 +1101,7 @@ components:
           type: string
           format: date
         taken:
-          type: integer
-          description: "1 = taken, 0 = not taken"
+          type: boolean
         time_taken:
           type: string
           nullable: true
@@ -1123,10 +1121,7 @@ components:
           format: date
           description: Defaults to today
         taken:
-          oneOf:
-            - type: boolean
-            - type: integer
-              enum: [0, 1]
+          type: boolean
         time_taken:
           type: string
         notes:
@@ -1211,8 +1206,7 @@ components:
           type: number
           nullable: true
         is_warmup:
-          type: integer
-          description: "1 = warmup, 0 = working set"
+          type: boolean
         superset_group:
           type: string
           nullable: true
