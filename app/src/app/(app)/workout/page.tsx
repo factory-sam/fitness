@@ -5,6 +5,7 @@ import { getLocalDateString } from "../../../lib/date";
 import { WorkoutSelector } from "../../../components/workout/workout-selector";
 import { ActiveWorkout } from "../../../components/workout/active-workout";
 import { WorkoutSummary } from "../../../components/workout/workout-summary";
+import posthog from "posthog-js";
 
 interface ProgrammeDay {
   id: number;
@@ -55,6 +56,12 @@ export default function WorkoutPage() {
     const data = await res.json();
     setSelectedDay(data);
     setPhase("active");
+    posthog.capture("workout_started", {
+      day_number: dayNumber,
+      day_name: data.day_name,
+      focus: data.focus,
+      programme: data.programme,
+    });
   };
 
   const handleFinish = (sets: LoggedSet[], notes: string) => {
@@ -82,6 +89,12 @@ export default function WorkoutPage() {
         }),
       });
       if (res.ok) {
+        posthog.capture("workout_completed", {
+          day_name: selectedDay.day_name,
+          focus: selectedDay.focus,
+          programme: selectedDay.programme,
+          sets_logged: loggedSets.length,
+        });
         setPhase("select");
         setSelectedDay(null);
         setLoggedSets([]);
@@ -97,6 +110,10 @@ export default function WorkoutPage() {
   };
 
   const confirmDiscard = () => {
+    posthog.capture("workout_discarded", {
+      day_name: selectedDay?.day_name,
+      sets_logged: loggedSets.length,
+    });
     setPhase("select");
     setLoggedSets([]);
     setShowDiscardConfirm(false);

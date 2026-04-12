@@ -1,5 +1,7 @@
 "use client";
 
+import posthog from "posthog-js";
+
 interface Supplement {
   id: number;
   name: string;
@@ -83,7 +85,15 @@ export function TodayStack({
               return (
                 <button
                   key={supp.id}
-                  onClick={() => onToggle(supp.id, !taken)}
+                  onClick={() => {
+                    posthog.capture("supplement_toggled", {
+                      supplement_id: supp.id,
+                      supplement_name: supp.name,
+                      taken: !taken,
+                      time_of_day: supp.time_of_day,
+                    });
+                    onToggle(supp.id, !taken);
+                  }}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-all duration-200 text-left group min-w-0 ${
                     taken
                       ? "bg-success/10 border border-success/30"

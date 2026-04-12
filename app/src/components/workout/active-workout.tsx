@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RestTimer, StopwatchTimer } from "./rest-timer";
 import { SupplementReminder } from "./supplement-reminder";
 import type { LoggedSet } from "../../app/(app)/workout/page";
+import posthog from "posthog-js";
 
 interface ProgrammeExercise {
   id: number;
@@ -79,11 +80,20 @@ export function ActiveWorkout({
   };
 
   const completeSet = (exercise: string, setIdx: number, restSec: number) => {
+    const currentSet = exerciseSets[exercise]?.[setIdx];
     setExerciseSets((prev) => {
       const copy = { ...prev };
       copy[exercise] = [...copy[exercise]];
       copy[exercise][setIdx] = { ...copy[exercise][setIdx], done: true };
       return copy;
+    });
+    posthog.capture("set_completed", {
+      exercise,
+      set_index: setIdx + 1,
+      reps: currentSet?.reps ? parseInt(currentSet.reps) || null : null,
+      weight: currentSet?.weight ? parseFloat(currentSet.weight) || null : null,
+      rpe: currentSet?.rpe ? parseFloat(currentSet.rpe) || null : null,
+      rest_seconds: restSec,
     });
     if (restSec > 0) {
       setRestTimer({ active: true, seconds: restSec });

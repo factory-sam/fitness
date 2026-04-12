@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "../../../utils/supabase/client";
 import Link from "next/link";
+import posthog from "posthog-js";
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("");
@@ -27,6 +28,7 @@ export default function SignUpPage() {
     if (error) {
       setError(error.message);
     } else {
+      posthog.capture("user_signed_up", { email });
       setSuccess(true);
     }
   };

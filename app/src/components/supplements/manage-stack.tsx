@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import posthog from "posthog-js";
 
 interface Supplement {
   id: number;
@@ -95,8 +96,20 @@ export function ManageStack({
         frequency: form.frequency,
         notes: form.notes || null,
       });
+      posthog.capture("supplement_updated", {
+        supplement_id: editingId,
+        supplement_name: form.name,
+        time_of_day: form.time_of_day,
+        frequency: form.frequency,
+      });
     } else {
       onAdd(form);
+      posthog.capture("supplement_added", {
+        supplement_name: form.name,
+        time_of_day: form.time_of_day,
+        frequency: form.frequency,
+        units: form.units,
+      });
     }
     resetForm();
   };
@@ -158,7 +171,14 @@ export function ManageStack({
                 EDIT
               </button>
               <button
-                onClick={() => onUpdate(supp.id, { active: supp.active ? 0 : 1 })}
+                onClick={() => {
+                  posthog.capture("supplement_updated", {
+                    supplement_id: supp.id,
+                    supplement_name: supp.name,
+                    active: !supp.active,
+                  });
+                  onUpdate(supp.id, { active: supp.active ? 0 : 1 });
+                }}
                 className={`type-micro px-2 py-1 transition-colors ${
                   supp.active ? "text-text-muted hover:text-error" : "text-success hover:text-gold"
                 }`}

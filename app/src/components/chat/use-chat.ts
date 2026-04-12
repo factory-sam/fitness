@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import type { ChatMessage, SSEEvent } from "../../lib/ai/chat-types";
+import posthog from "posthog-js";
 
 function generateId(): string {
   return Math.random().toString(36).slice(2, 10);
@@ -49,6 +50,10 @@ export function useChat() {
       };
       setMessages((prev) => [...prev, assistantMsg]);
       setIsStreaming(true);
+      posthog.capture("ai_chat_message_sent", {
+        session_id: sessionId,
+        message_length: text.trim().length,
+      });
 
       const controller = new AbortController();
       abortRef.current = controller;
@@ -162,7 +167,9 @@ export function useChat() {
         }
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
-          setError(err instanceof Error ? err.message : "Connection failed");
+          const message = err instanceof Error ? err.message : "Connection failed";
+          setError(message);
+          posthog.capture("ai_chat_error", { session_id: sessionId, error_message: message });
         }
       } finally {
         setIsStreaming(false);
