@@ -188,6 +188,7 @@ export function useChat() {
     setMessages([]);
     setSessionId(null);
     setError(null);
+    hasAutoTitled.current = false;
     if (typeof window !== "undefined") {
       localStorage.removeItem("vitruvian-chat-session");
     }

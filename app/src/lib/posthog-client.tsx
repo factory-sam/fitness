@@ -2,22 +2,33 @@
 
 import posthog from "posthog-js";
 import { PostHogProvider as PHProvider, usePostHog } from "posthog-js/react";
-import { useEffect, type ReactNode } from "react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useEffect, Suspense, type ReactNode } from "react";
 
 export function PostHogProvider({ children }: { children: ReactNode }) {
   return <PHProvider client={posthog}>{children}</PHProvider>;
 }
 
-export function PostHogPageView() {
+function PageViewTracker() {
   const ph = usePostHog();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!ph) return;
-    ph.capture("$pageview", {
-      $current_url: window.location.href,
-      $pathname: window.location.pathname,
-    });
-  }, [ph]);
+    if (!ph || !pathname) return;
+    const url = searchParams.size
+      ? `${window.location.origin}${pathname}?${searchParams.toString()}`
+      : `${window.location.origin}${pathname}`;
+    ph.capture("$pageview", { $current_url: url, $pathname: pathname });
+  }, [ph, pathname, searchParams]);
 
   return null;
+}
+
+export function PostHogPageView() {
+  return (
+    <Suspense fallback={null}>
+      <PageViewTracker />
+    </Suspense>
+  );
 }

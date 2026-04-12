@@ -34,7 +34,7 @@ multi-tenancy via RLS.
 - All queries go through the Supabase client which respects RLS policies.
 
 ### Auth
-- Middleware (`src/middleware.ts`) intercepts all requests.
+- Proxy (`src/proxy.ts`) intercepts all requests.
 - Unauthenticated users → redirect to `/login`.
 - Supabase `auth.uid()` drives RLS. `BEFORE INSERT` triggers auto-set `user_id`.
 - No service role key in the app — everything uses the publishable key.

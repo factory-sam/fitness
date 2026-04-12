@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 
   const url = new URL(request.url);
-  const limit = parseInt(url.searchParams.get("limit") ?? "20");
+  const limit = parseInt(url.searchParams.get("limit") ?? "20") || 20;
   const sessions = await getAISessions(Math.min(limit, 50));
   return Response.json(sessions);
 }

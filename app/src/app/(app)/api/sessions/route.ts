@@ -54,7 +54,7 @@ export async function POST(request: Request) {
         date: body.date,
       },
     });
-    await posthog.shutdown();
+    await posthog.flush();
 
     return Response.json({ id: Number(sessionId) }, { status: 201 });
   } catch (err) {

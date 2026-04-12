@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       has_body_fat: body.body_fat_pct != null,
     },
   });
-  await posthog.shutdown();
+  await posthog.flush();
 
   return Response.json({ success: true }, { status: 201 });
 }
