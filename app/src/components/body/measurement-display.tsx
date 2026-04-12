@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { VitruvianMan } from "./vitruvian-man";
+import { LogMeasurements } from "./log-measurements";
 
 interface MeasurementData {
   shoulders?: number;
@@ -93,9 +94,12 @@ export function MeasurementDisplay({
         </tbody>
       </table>
 
-      <p className="type-micro text-text-muted mt-3">
-        Self-measured. Trend over time matters more than absolute values.
-      </p>
+      <div className="flex items-center justify-between mt-3">
+        <p className="type-micro text-text-muted">
+          Self-measured. Trend matters more than absolutes.
+        </p>
+        <LogMeasurements />
+      </div>
     </div>
   );
 }
