@@ -11,6 +11,7 @@ import {
 const STORAGE_KEY = "vitruvian-chat-open";
 
 let listeners: Array<() => void> = [];
+let hydrated = false;
 
 function emitChange() {
   for (const l of listeners) l();
@@ -18,12 +19,17 @@ function emitChange() {
 
 function subscribe(cb: () => void) {
   listeners = [...listeners, cb];
+  if (!hydrated) {
+    hydrated = true;
+    queueMicrotask(emitChange);
+  }
   return () => {
     listeners = listeners.filter((l) => l !== cb);
   };
 }
 
 function getSnapshot() {
+  if (!hydrated) return false;
   return localStorage.getItem(STORAGE_KEY) === "true";
 }
 
@@ -40,7 +46,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const isOpen = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   const toggle = useCallback(() => {
-    const next = !getSnapshot();
+    const next = !(localStorage.getItem(STORAGE_KEY) === "true");
     localStorage.setItem(STORAGE_KEY, String(next));
     emitChange();
   }, []);
