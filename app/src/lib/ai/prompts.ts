@@ -77,13 +77,56 @@ Return ONLY a valid JSON array with this structure:
   }
 ]
 
-Rules:
+## General Rules
 - Only include insights backed by actual data. Never speculate.
 - Include specific numbers: weights, percentages, dates, durations.
 - Maximum 4 insights. Prioritize actionable findings.
 - If insufficient data exists, return an empty array [].
-- For plateau alerts: only flag exercises stalled for 2+ weeks with 3+ data points.
-- For body comp: only include if 3+ entries exist spanning 2+ weeks.`;
+
+## Plateau Detection (type: "plateau_alert", severity: "warning")
+Call get_training_history(days: 30) and get_working_weights. For each exercise:
+- **Flat weight**: same weight for 2+ consecutive sessions at the same set scheme → plateau.
+- **Declining weight**: weight decreased over 2+ sessions → regression.
+- **RPE ceiling**: RPE consistently 9-10 for 2+ sessions at the same weight → stall.
+
+Recommendations by scenario:
+| Scenario | Recommendation |
+|----------|---------------|
+| Weight flat, RPE < 8 | "Increase [exercise] to [weight+5] lbs — RPE suggests headroom" |
+| Weight flat, RPE 8-9 | "Try adding 1 rep per set before increasing weight" |
+| Weight flat, RPE 9-10 | "Consider a deload week, then attempt [weight+5] lbs fresh" |
+| Weight decreasing | "Form check recommended. Drop to [lower weight] for 2 sessions" |
+
+Only flag exercises with 3+ sessions spanning 2+ weeks of data. One specific recommendation per exercise. Avoid false positives on exercises with normal session-to-session variation (±5 lbs).
+
+## Body Composition Correlations (type: "body_comp", severity: "info" or "success")
+Call get_body_comp_trends, get_training_history(days: 30), and get_supplement_compliance.
+Only generate if 3+ body_comp entries exist spanning 2+ weeks.
+
+Correlation types to check:
+1. **Body comp + training volume**: Compare weight/body fat trends against weekly set counts.
+   - Weight up + volume up → "likely muscle gain"
+   - Body fat down + consistent training → "your cut is preserving muscle"
+   - Lean mass stable + weight down → "recomposition in progress"
+
+2. **Body comp + measurements**: Cross-reference weight changes with waist, arm, shoulder measurements.
+   - Waist down + weight stable → "recomposition in progress"
+   - Arm measurements up → "upper body hypertrophy trend"
+
+3. **Body comp + supplements**: Correlate compliance rates with composition changes.
+   - Creatine compliance high + weight up → "expected water retention from creatine"
+   - Low compliance + stalled progress → note the correlation
+
+Language rules:
+- Use "correlating with" not "caused by" — distinguish correlation from causation.
+- Reference specific numbers and timeframes (e.g. "Weight up 1.5 lbs over 4 weeks").
+- Keep tone positive and constructive.
+
+## Volume Trends (type: "volume_trend", severity: "info")
+Compare this week's total sets to last week's. Note percentage change and whether progressive overload is on track.
+
+## Supplement Compliance (type: "compliance", severity: "info" or "warning")
+Call get_supplement_compliance. Report adherence percentage. Flag specific missed supplements if adherence < 90%.`;
 
 export const PARSE_WORKOUT_PROMPT = `Parse the following natural language workout description into structured JSON.
 
