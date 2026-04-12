@@ -17,10 +17,12 @@ export default defineConfig({
     sequence: {
       shuffle: true,
     },
-    reporters: ["default", "junit"],
+    reporters: ["default", "junit", "json", "verbose"],
     outputFile: {
       junit: "./test-results/junit.xml",
+      json: "./test-results/results.json",
     },
+    retry: 2,
     coverage: {
       provider: "v8",
       reporter: ["text", "lcov", "json-summary"],
