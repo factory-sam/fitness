@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { getLocalDateString } from "../../lib/date";
 
 interface UntakenSupplement {
   id: number;
@@ -14,7 +15,7 @@ export function SupplementReminder() {
   const [dismissed, setDismissed] = useState(false);
 
   const fetchUntaken = async () => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getLocalDateString();
     const [suppsRes, logRes] = await Promise.all([
       fetch("/api/supplements"),
       fetch(`/api/supplements/log?date=${today}`),
@@ -42,7 +43,7 @@ export function SupplementReminder() {
   }, []);
 
   const handleQuickTake = async (id: number) => {
-    const today = new Date().toISOString().split("T")[0];
+    const today = getLocalDateString();
     await fetch("/api/supplements/log", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

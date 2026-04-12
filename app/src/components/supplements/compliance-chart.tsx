@@ -1,5 +1,7 @@
 "use client";
 
+import { getLocalDateString } from "../../lib/date";
+
 interface StreakData {
   id: number;
   name: string;
@@ -27,7 +29,7 @@ function getWeekDates(): string[] {
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    dates.push(d.toISOString().split("T")[0]);
+    dates.push(getLocalDateString(d));
   }
   return dates;
 }
@@ -45,7 +47,7 @@ function getLast12Weeks(): string[][] {
       const day = new Date(thisSunday);
       day.setDate(thisSunday.getDate() - w * 7 + d);
       if (day <= now) {
-        week.push(day.toISOString().split("T")[0]);
+        week.push(getLocalDateString(day));
       }
     }
     weeks.push(week);
@@ -95,8 +97,8 @@ export function ComplianceChart({
         <div className="flex items-end gap-1 h-16">
           {weekDates.map((date, i) => {
             const val = complianceMap.get(date) ?? 0;
-            const today = new Date().toISOString().split("T")[0];
-            const isFuture = date > today;
+            const todayStr = getLocalDateString();
+            const isFuture = date > todayStr;
             return (
               <div key={date} className="flex-1 flex flex-col items-center gap-1">
                 <div
@@ -140,8 +142,8 @@ export function ComplianceChart({
             <div key={wi} className="flex flex-col gap-[3px]">
               {week.map((date) => {
                 const val = complianceMap.get(date) ?? 0;
-                const today = new Date().toISOString().split("T")[0];
-                const isFuture = date > today;
+                const todayStr = getLocalDateString();
+                const isFuture = date > todayStr;
                 return (
                   <div
                     key={date}

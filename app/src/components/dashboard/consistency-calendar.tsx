@@ -1,5 +1,7 @@
 "use client";
 
+import { getLocalDateString } from "../../lib/date";
+
 const DAY_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
 export function ConsistencyCalendar({ dates }: { dates: string[] }) {
@@ -12,7 +14,7 @@ export function ConsistencyCalendar({ dates }: { dates: string[] }) {
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
-    const dateStr = d.toISOString().split("T")[0];
+    const dateStr = getLocalDateString(d);
     const isWorkout = dateSet.has(dateStr);
     const isToday = i === 0;
     cells.push({ date: dateStr, isWorkout, isToday });

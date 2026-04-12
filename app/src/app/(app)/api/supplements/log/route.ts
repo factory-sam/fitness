@@ -3,6 +3,7 @@ import {
   getSupplementLogForDate,
   getSupplementLogRange,
 } from "../../../../../lib/queries";
+import { getLocalDateString } from "../../../../../lib/date";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     return Response.json(log.map((l) => ({ ...l, taken: l.taken ? 1 : 0 })));
   }
 
-  const today = new Date().toISOString().split("T")[0];
+  const today = getLocalDateString();
   const log = await getSupplementLogForDate(today);
   return Response.json(log.map((l) => ({ ...l, taken: l.taken ? 1 : 0 })));
 }
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
   const body = await request.json();
   await logSupplementIntake({
     supplement_id: body.supplement_id,
-    date: body.date ?? new Date().toISOString().split("T")[0],
+    date: body.date ?? getLocalDateString(),
     taken: body.taken === 1 || body.taken === true,
     time_taken: body.time_taken,
     notes: body.notes,

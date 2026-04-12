@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getLocalDateString } from "../../../lib/date";
 import { WorkoutSelector } from "../../../components/workout/workout-selector";
 import { ActiveWorkout } from "../../../components/workout/active-workout";
 import { WorkoutSummary } from "../../../components/workout/workout-summary";
@@ -66,7 +67,7 @@ export default function WorkoutPage() {
     if (!selectedDay || saving) return;
     setSaving(true);
     try {
-      const today = new Date().toISOString().split("T")[0];
+      const today = getLocalDateString();
       const res = await fetch("/api/sessions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
