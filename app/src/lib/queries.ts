@@ -665,27 +665,6 @@ export async function clearExpiredInsights() {
   if (error) throw error;
 }
 
-// --- Push Subscriptions ---
-
-export async function upsertPushSubscription(sub: {
-  endpoint: string;
-  p256dh: string;
-  auth_token: string;
-  user_agent?: string;
-}) {
-  const supabase = await getSupabase();
-  const { error } = await supabase
-    .from("push_subscriptions")
-    .upsert(sub, { onConflict: "user_id,endpoint" });
-  if (error) throw error;
-}
-
-export async function deletePushSubscription(endpoint: string) {
-  const supabase = await getSupabase();
-  const { error } = await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
-  if (error) throw error;
-}
-
 // --- Notification Preferences ---
 
 export async function getNotificationPreferences() {
@@ -731,4 +710,13 @@ export async function markNotificationClicked(notificationId: number) {
     .update({ clicked: true })
     .eq("id", notificationId);
   if (error) throw error;
+}
+
+export async function getUnreadNotificationCount() {
+  const supabase = await getSupabase();
+  const { count } = await supabase
+    .from("notification_log")
+    .select("id", { count: "exact", head: true })
+    .eq("clicked", false);
+  return count ?? 0;
 }

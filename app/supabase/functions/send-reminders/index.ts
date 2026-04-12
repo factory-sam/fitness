@@ -1,14 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "jsr:@supabase/supabase-js@2";
-import webpush from "npm:web-push@3";
-
-interface PushSub {
-  id: number;
-  user_id: string;
-  endpoint: string;
-  p256dh: string;
-  auth_token: string;
-}
 
 interface Preferences {
   user_id: string;
@@ -26,11 +17,9 @@ interface Preferences {
 
 interface Notification {
   userId: string;
-  sub: PushSub;
   type: string;
   title: string;
   body: string;
-  tag: string;
   url: string;
 }
 
@@ -94,51 +83,21 @@ Deno.serve(async () => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY");
-    const vapidEmail = Deno.env.get("VAPID_EMAIL");
-    const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY");
-    if (!vapidPrivate || !vapidEmail || !vapidPublic) {
-      return new Response(JSON.stringify({ error: "VAPID not configured" }), { status: 500 });
-    }
+    const { data: allPrefs } = await supabase.from("notification_preferences").select("*");
 
-    webpush.setVapidDetails(`mailto:${vapidEmail}`, vapidPublic, vapidPrivate);
-
-    const { data: subs } = await supabase
-      .from("push_subscriptions")
-      .select("id, user_id, endpoint, p256dh, auth_token");
-    if (!subs || subs.length === 0) {
+    if (!allPrefs || allPrefs.length === 0) {
       return new Response(JSON.stringify({ sent: 0 }));
-    }
-
-    const userSubs = new Map<string, PushSub[]>();
-    for (const s of subs as PushSub[]) {
-      const arr = userSubs.get(s.user_id) ?? [];
-      arr.push(s);
-      userSubs.set(s.user_id, arr);
-    }
-
-    const userIds = [...userSubs.keys()];
-    const { data: allPrefs } = await supabase
-      .from("notification_preferences")
-      .select("*")
-      .in("user_id", userIds);
-    const prefsMap = new Map<string, Preferences>();
-    for (const p of (allPrefs ?? []) as Preferences[]) {
-      prefsMap.set(p.user_id, p);
     }
 
     const queue: Notification[] = [];
 
-    for (const [userId, subscriptions] of userSubs) {
-      const prefs = prefsMap.get(userId);
-      if (!prefs) continue;
-
+    for (const prefs of allPrefs as Preferences[]) {
+      const userId = prefs.user_id;
       const { minutes: currentMin, dayOfWeek } = getCurrentMinutesInTz(prefs.timezone);
       if (isInQuietHours(currentMin, prefs.quiet_hours_start, prefs.quiet_hours_end)) continue;
 
       const today = todayInTz(prefs.timezone);
 
-      // Supplement reminder
       if (
         prefs.supplements_enabled &&
         isWithinWindow(currentMin, timeToMinutes(prefs.supplements_time))
@@ -164,21 +123,16 @@ Deno.serve(async () => {
             .slice(0, 3)
             .map((s: { name: string }) => s.name)
             .join(", ");
-          for (const sub of subscriptions) {
-            queue.push({
-              userId,
-              sub,
-              type: "supplement",
-              title: "Supplement Reminder",
-              body: `${untaken.length} supplement${untaken.length > 1 ? "s" : ""} remaining: ${names}`,
-              tag: "supplement-reminder",
-              url: "/supplements",
-            });
-          }
+          queue.push({
+            userId,
+            type: "supplement",
+            title: "Supplement Reminder",
+            body: `${untaken.length} supplement${untaken.length > 1 ? "s" : ""} remaining: ${names}`,
+            url: "/supplements",
+          });
         }
       }
 
-      // Workout reminder
       if (prefs.workout_enabled && isWithinWindow(currentMin, timeToMinutes(prefs.workout_time))) {
         const dayNames = [
           "Sunday",
@@ -209,22 +163,17 @@ Deno.serve(async () => {
             .limit(1);
 
           if (!todaySessions || todaySessions.length === 0) {
-            for (const sub of subscriptions) {
-              queue.push({
-                userId,
-                sub,
-                type: "workout",
-                title: "Training Day",
-                body: `Today is ${match.focus} — ready to train?`,
-                tag: "workout-reminder",
-                url: "/workout",
-              });
-            }
+            queue.push({
+              userId,
+              type: "workout",
+              title: "Training Day",
+              body: `Today is ${match.focus} — ready to train?`,
+              url: "/workout",
+            });
           }
         }
       }
 
-      // Body comp reminder
       if (
         prefs.body_comp_enabled &&
         dayOfWeek === prefs.body_comp_day &&
@@ -240,32 +189,24 @@ Deno.serve(async () => {
           .limit(1);
 
         if (!recent || recent.length === 0) {
-          for (const sub of subscriptions) {
-            queue.push({
-              userId,
-              sub,
-              type: "body_comp",
-              title: "Weekly Check-in",
-              body: "Time to log your weight and measurements",
-              tag: "body-comp-reminder",
-              url: "/body",
-            });
-          }
+          queue.push({
+            userId,
+            type: "body_comp",
+            title: "Weekly Check-in",
+            body: "Time to log your weight and measurements",
+            url: "/body",
+          });
         }
       }
     }
 
-    // Deduplicate: skip if same (user, type) sent within 12 hours
     const twelveHoursAgo = new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
     const deduped: Notification[] = [];
     const seen = new Set<string>();
 
     for (const n of queue) {
       const dedupId = `${n.userId}:${n.type}`;
-      if (seen.has(dedupId)) {
-        deduped.push(n);
-        continue;
-      }
+      if (seen.has(dedupId)) continue;
 
       const { data: recent } = await supabase
         .from("notification_log")
@@ -275,61 +216,25 @@ Deno.serve(async () => {
         .gte("sent_at", twelveHoursAgo)
         .limit(1);
 
-      if (recent && recent.length > 0) {
-        seen.add(dedupId);
-        continue;
-      }
-
       seen.add(dedupId);
-      deduped.push(n);
-    }
-
-    // Send notifications
-    let sent = 0;
-    const expiredSubIds: number[] = [];
-    const loggedTypes = new Set<string>();
-
-    for (const n of deduped) {
-      const payload = JSON.stringify({
-        title: n.title,
-        body: n.body,
-        icon: "/vitruvian-man.svg",
-        tag: n.tag,
-        data: { url: n.url, type: n.type },
-      });
-
-      try {
-        await webpush.sendNotification(
-          { endpoint: n.sub.endpoint, keys: { p256dh: n.sub.p256dh, auth: n.sub.auth_token } },
-          payload,
-        );
-        sent++;
-
-        const logId = `${n.userId}:${n.type}`;
-        if (!loggedTypes.has(logId)) {
-          loggedTypes.add(logId);
-          await supabase.from("notification_log").insert({
-            user_id: n.userId,
-            type: n.type,
-            payload: { title: n.title, body: n.body, url: n.url },
-          });
-        }
-      } catch (err: unknown) {
-        const status = (err as { statusCode?: number }).statusCode;
-        if (status === 410 || status === 401) {
-          expiredSubIds.push(n.sub.id);
-        }
+      if (!recent || recent.length === 0) {
+        deduped.push(n);
       }
     }
 
-    if (expiredSubIds.length > 0) {
-      await supabase.from("push_subscriptions").delete().in("id", expiredSubIds);
+    let sent = 0;
+    for (const n of deduped) {
+      await supabase.from("notification_log").insert({
+        user_id: n.userId,
+        type: n.type,
+        payload: { title: n.title, body: n.body, url: n.url },
+      });
+      sent++;
     }
 
-    return new Response(
-      JSON.stringify({ sent, expired: expiredSubIds.length, queued: deduped.length }),
-      { headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ sent, queued: queue.length }), {
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("send-reminders error:", err);
     return new Response(JSON.stringify({ error: String(err) }), { status: 500 });

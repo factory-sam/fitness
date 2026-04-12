@@ -1,13 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  getSubscriptionStatus,
-  requestNotificationPermission,
-  subscribeToPush,
-  unsubscribeFromPush,
-  type PushStatus,
-} from "../../../lib/notifications";
 
 interface Preferences {
   supplements_enabled: boolean;
@@ -20,6 +13,14 @@ interface Preferences {
   quiet_hours_start: string | null;
   quiet_hours_end: string | null;
   timezone: string;
+}
+
+interface NotificationEntry {
+  id: number;
+  type: string;
+  payload: { title: string; body: string; url: string };
+  sent_at: string;
+  clicked: boolean;
 }
 
 const DEFAULTS: Preferences = {
@@ -45,17 +46,20 @@ const TIMES = Array.from({ length: 48 }, (_, i) => {
 
 export default function NotificationsPage() {
   const [prefs, setPrefs] = useState<Preferences>(DEFAULTS);
-  const [pushStatus, setPushStatus] = useState<PushStatus>("default");
   const [saving, setSaving] = useState(false);
-  const [testSent, setTestSent] = useState(false);
+  const [history, setHistory] = useState<NotificationEntry[]>([]);
 
   useEffect(() => {
-    setPushStatus(getSubscriptionStatus());
     fetch("/api/notifications/preferences")
       .then((r) => r.json())
       .then((d) => {
         if (d.preferences) setPrefs({ ...DEFAULTS, ...d.preferences });
       })
+      .catch(() => {});
+
+    fetch("/api/notifications/history?limit=20")
+      .then((r) => r.json())
+      .then((d) => setHistory(d.history ?? []))
       .catch(() => {});
   }, []);
 
@@ -77,29 +81,15 @@ export default function NotificationsPage() {
     [prefs],
   );
 
-  async function handleEnablePush() {
-    const permission = await requestNotificationPermission();
-    setPushStatus(permission);
-    if (permission === "granted") {
-      await subscribeToPush();
+  async function handleClick(entry: NotificationEntry) {
+    if (!entry.clicked) {
+      await fetch("/api/notifications/clicked", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: entry.id }),
+      });
+      setHistory((h) => h.map((n) => (n.id === entry.id ? { ...n, clicked: true } : n)));
     }
-  }
-
-  async function handleDisablePush() {
-    await unsubscribeFromPush();
-    setPushStatus("default");
-  }
-
-  async function handleTestNotification() {
-    if (!("serviceWorker" in navigator)) return;
-    const reg = await navigator.serviceWorker.ready;
-    await reg.showNotification("Vitruvian", {
-      body: "Test notification — push is working!",
-      icon: "/vitruvian-man.svg",
-      tag: "test",
-    });
-    setTestSent(true);
-    setTimeout(() => setTestSent(false), 3000);
   }
 
   return (
@@ -109,39 +99,8 @@ export default function NotificationsPage() {
         {saving && <span className="type-micro text-text-muted">Saving...</span>}
       </header>
 
-      {/* Push Status */}
+      {/* Timezone */}
       <section className="card mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <span className="type-label text-text-muted">Push Status</span>
-          <div className="flex items-center gap-3">
-            <span
-              className={`type-micro ${pushStatus === "granted" ? "text-success" : "text-text-muted"}`}
-            >
-              {pushStatus === "granted"
-                ? "● Enabled"
-                : pushStatus === "denied"
-                  ? "● Denied"
-                  : pushStatus === "unsupported"
-                    ? "● Unsupported"
-                    : "● Disabled"}
-            </span>
-            {pushStatus === "granted" ? (
-              <button
-                onClick={handleDisablePush}
-                className="type-micro text-gold hover:text-gold-bright"
-              >
-                Disable
-              </button>
-            ) : pushStatus !== "denied" && pushStatus !== "unsupported" ? (
-              <button
-                onClick={handleEnablePush}
-                className="type-micro text-gold hover:text-gold-bright"
-              >
-                Enable
-              </button>
-            ) : null}
-          </div>
-        </div>
         <div className="flex items-center justify-between">
           <span className="type-label text-text-muted">Timezone</span>
           <span className="type-data text-text-secondary">{prefs.timezone}</span>
@@ -226,7 +185,7 @@ export default function NotificationsPage() {
       </section>
 
       {/* Quiet Hours */}
-      <section className="card mb-6">
+      <section className="card mb-8">
         <span className="type-label text-text-muted block mb-2">Quiet Hours</span>
         <p className="type-micro text-text-muted mb-3">No notifications during these hours</p>
         <div className="flex items-center gap-3">
@@ -243,14 +202,40 @@ export default function NotificationsPage() {
         </div>
       </section>
 
-      {/* Test */}
-      {pushStatus === "granted" && (
-        <button
-          onClick={handleTestNotification}
-          className="type-micro text-gold hover:text-gold-bright transition-colors"
-        >
-          {testSent ? "✓ Sent!" : "Send test notification"}
-        </button>
+      {/* Recent Notifications */}
+      <h2 className="type-subheading text-text mb-4">Recent</h2>
+      {history.length === 0 ? (
+        <p className="type-secondary text-text-muted">No notifications yet</p>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {history.map((entry) => (
+            <button
+              key={entry.id}
+              onClick={() => handleClick(entry)}
+              className={`card text-left transition-colors ${
+                entry.clicked ? "opacity-60" : "border-gold/30"
+              }`}
+            >
+              <div className="flex items-baseline justify-between mb-1">
+                <span className="type-label text-text">
+                  {!entry.clicked && (
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-gold mr-2" />
+                  )}
+                  {entry.payload.title}
+                </span>
+                <span className="type-micro text-text-muted">
+                  {new Date(entry.sent_at).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+              <p className="type-micro text-text-secondary">{entry.payload.body}</p>
+            </button>
+          ))}
+        </div>
       )}
     </div>
   );
