@@ -25,7 +25,7 @@ jobs:
 
       - name: Setup droid CLI
         run: |
-          curl -fsSL https://app.factory.ai/install.sh | sh
+          curl -fsSL https://app.factory.ai/cli | sh
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Review PR
