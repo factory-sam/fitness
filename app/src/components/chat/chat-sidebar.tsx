@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useCallback } from "react";
+import { useFeatureFlagEnabled } from "posthog-js/react";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
 import { ChatHistory } from "./chat-history";
@@ -8,6 +9,7 @@ import { useChat } from "./use-chat";
 import { useChatOpen } from "./chat-provider";
 
 export function ChatSidebar() {
+  const enabled = useFeatureFlagEnabled("ai-chat");
   const { isOpen, toggle } = useChatOpen();
   const {
     messages,
@@ -31,6 +33,7 @@ export function ChatSidebar() {
   );
 
   useEffect(() => {
+    if (!enabled) return;
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
@@ -39,7 +42,9 @@ export function ChatSidebar() {
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [toggle]);
+  }, [toggle, enabled]);
+
+  if (!enabled) return null;
 
   return (
     <>
