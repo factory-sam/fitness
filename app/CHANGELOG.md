@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.1.4](https://github.com/factory-sam/fitness/compare/vitruvian-v0.1.3...vitruvian-v0.1.4) (2026-04-12)
+
+
+### Features
+
+* add Vercel Analytics and Speed Insights ([f4c2c66](https://github.com/factory-sam/fitness/commit/f4c2c66b09608269581d4492c1c8ad2829c2831f))
+* add Vercel Analytics and Speed Insights ([ad27213](https://github.com/factory-sam/fitness/commit/ad2721313bbcff2cded8878c831eda5fd2d3c6ff))
+
+
+### Bug Fixes
+
+* address droid review feedback and CI build failure ([baef645](https://github.com/factory-sam/fitness/commit/baef6451a91bcc9f436a5f79eb3589176045612e))
+* await posthog.isFeatureEnabled before nullish coalescing ([9bcdd1c](https://github.com/factory-sam/fitness/commit/9bcdd1cb19d1944b3b8ce93036dfd564aecde9de))
+* improve agent readiness across 10 signals ([ed76a33](https://github.com/factory-sam/fitness/commit/ed76a3342367e3b5095f4e4cc29e0904b8a31924))
+* improve agent readiness across 10 signals ([f47ff52](https://github.com/factory-sam/fitness/commit/f47ff520d024284ffbadf153eb786573b9f9afd0))
+* resolve remaining droid review feedback ([724ef48](https://github.com/factory-sam/fitness/commit/724ef48d23b8c2a42183e0e5cd95978e67086cfc))
+
 ## [0.1.3](https://github.com/factory-sam/fitness/compare/vitruvian-v0.1.2...vitruvian-v0.1.3) (2026-04-12)
 
 
