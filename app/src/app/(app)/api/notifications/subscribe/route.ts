@@ -16,8 +16,8 @@ export async function POST(request: Request) {
 
     await upsertPushSubscription({
       endpoint: body.endpoint,
-      p256dh_key: body.keys.p256dh,
-      auth_key: body.keys.auth,
+      p256dh: body.keys.p256dh,
+      auth_token: body.keys.auth,
       user_agent: typeof body.userAgent === "string" ? body.userAgent : undefined,
     });
 
