@@ -103,6 +103,25 @@ export async function getAllWorkingWeights() {
   });
 }
 
+export async function upsertWorkingWeight(data: {
+  exercise: string;
+  weight: number;
+  weight_unit?: string;
+  source?: string;
+  notes?: string;
+}) {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("working_weights").insert({
+    exercise: data.exercise,
+    weight: data.weight,
+    weight_unit: data.weight_unit ?? "lbs",
+    date_set: getLocalDateString(),
+    source: data.source ?? "ai_agent",
+    notes: data.notes ?? null,
+  });
+  if (error) throw error;
+}
+
 export async function getExerciseHistory(exercise: string, limit = 50) {
   const supabase = await getSupabase();
   const { data } = await supabase
