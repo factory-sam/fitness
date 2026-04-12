@@ -1,5 +1,6 @@
 import { getRecentSessions, createSession, createSet } from "../../../../lib/queries";
 import log from "../../../../lib/logger";
+import { getPostHogClient } from "../../../../lib/posthog-server";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -39,6 +40,22 @@ export async function POST(request: Request) {
     }
 
     log.info({ sessionId: Number(sessionId), setCount }, "session created");
+
+    const posthog = getPostHogClient();
+    const distinctId = request.headers.get("x-posthog-distinct-id") ?? "anonymous";
+    posthog.capture({
+      distinctId,
+      event: "session_created",
+      properties: {
+        session_id: Number(sessionId),
+        name: body.name,
+        programme: body.programme,
+        sets_logged: setCount,
+        date: body.date,
+      },
+    });
+    await posthog.shutdown();
+
     return Response.json({ id: Number(sessionId) }, { status: 201 });
   } catch (err) {
     log.error({ err }, "failed to create session");
