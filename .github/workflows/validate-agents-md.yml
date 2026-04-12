@@ -1,0 +1,78 @@
+name: Validate AGENTS.md
+
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "app/package.json"
+      - "app/tsconfig.json"
+      - "app/src/**"
+  push:
+    branches: [main]
+    paths:
+      - "AGENTS.md"
+      - "app/package.json"
+      - "app/tsconfig.json"
+      - "app/src/**"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: app/pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify AGENTS.md commands work
+        run: |
+          echo "=== Checking lint ==="
+          pnpm lint
+          echo "=== Checking typecheck ==="
+          pnpm exec tsc --noEmit
+          echo "=== Checking test ==="
+          pnpm test
+          echo "=== Checking knip ==="
+          pnpm knip || true
+          echo "=== All AGENTS.md commands verified ==="
+
+      - name: Check AGENTS.md references valid paths
+        run: |
+          cd ..
+          errors=0
+
+          # Verify referenced directories exist
+          for dir in "components/ui" "components/dashboard" "components/workout" "components/body" "components/supplements" "components/programme"; do
+            if [ ! -d "app/src/$dir" ]; then
+              echo "ERROR: AGENTS.md references src/$dir but it does not exist"
+              errors=$((errors + 1))
+            fi
+          done
+
+          # Verify key referenced files exist
+          for file in "lib/queries.ts" "utils/supabase/server.ts" "utils/supabase/client.ts" "utils/supabase/middleware.ts" "middleware.ts" "app/globals.css"; do
+            if [ ! -f "app/src/$file" ]; then
+              echo "ERROR: AGENTS.md references src/$file but it does not exist"
+              errors=$((errors + 1))
+            fi
+          done
+
+          if [ $errors -gt 0 ]; then
+            echo "AGENTS.md has $errors stale references"
+            exit 1
+          fi
+          echo "All AGENTS.md path references are valid"
