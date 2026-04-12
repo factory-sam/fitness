@@ -1,0 +1,27 @@
+name: Chore / Tech Debt
+description: Maintenance task, refactor, or dependency update
+labels: ["chore"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What needs to be done?
+      description: Describe the maintenance task or tech debt to address.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Dependencies
+        - CI/CD
+        - Testing
+        - Performance
+        - Code Quality
+        - Documentation
+        - Infrastructure
+        - Other
+    validations:
+      required: true
