@@ -1,0 +1,47 @@
+services:
+  supabase-db:
+    image: supabase/postgres:15.8.1.060
+    ports:
+      - "54322:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - supabase-db-data:/var/lib/postgresql/data
+      - ./app/supabase/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  supabase-studio:
+    image: supabase/studio:20250106-b7da657
+    ports:
+      - "54323:3000"
+    environment:
+      STUDIO_PG_META_URL: http://supabase-meta:8080
+      POSTGRES_PASSWORD: postgres
+      SUPABASE_URL: http://supabase-kong:8000
+      SUPABASE_REST_URL: http://supabase-kong:8000/rest/v1/
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+  supabase-meta:
+    image: supabase/postgres-meta:0.84.2
+    ports:
+      - "54324:8080"
+    environment:
+      PG_META_PORT: 8080
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: 5432
+      PG_META_DB_NAME: postgres
+      PG_META_DB_USER: postgres
+      PG_META_DB_PASSWORD: postgres
+    depends_on:
+      supabase-db:
+        condition: service_healthy
+
+volumes:
+  supabase-db-data:

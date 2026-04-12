@@ -38,17 +38,93 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Verify AGENTS.md commands work
+      - name: Lint and typecheck
         run: |
-          echo "=== Checking lint ==="
           pnpm lint
-          echo "=== Checking typecheck ==="
           pnpm exec tsc --noEmit
-          echo "=== Checking test ==="
-          pnpm test
-          echo "=== Checking knip ==="
-          pnpm knip || true
-          echo "=== All AGENTS.md commands verified ==="
+
+      - name: Run tests with timing
+        run: |
+          TEST_START=$(date +%s%N)
+          pnpm test 2>&1 | tee test-output.log
+          TEST_EXIT=${PIPESTATUS[0]}
+          TEST_END=$(date +%s%N)
+          TEST_MS=$(( (TEST_END - TEST_START) / 1000000 ))
+
+          echo "### Test Performance" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Total duration | ${TEST_MS}ms |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Vitest version | $(pnpm exec vitest --version) |" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f test-results/results.json ]; then
+            TOTAL=$(jq '.numTotalTests // 0' test-results/results.json)
+            PASSED=$(jq '.numPassedTests // 0' test-results/results.json)
+            FAILED=$(jq '.numFailedTests // 0' test-results/results.json)
+            echo "| Tests passed | ${PASSED}/${TOTAL} |" >> "$GITHUB_STEP_SUMMARY"
+            if [ "$FAILED" -gt 0 ]; then
+              echo "| Tests failed | ${FAILED} |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+
+          exit $TEST_EXIT
+
+      - name: Detect flaky tests
+        if: always()
+        run: |
+          if [ -f test-results/results.json ]; then
+            node -e "
+              const fs = require('fs');
+              const results = JSON.parse(fs.readFileSync('test-results/results.json', 'utf8'));
+              const suites = results.testResults || [];
+              let flaky = [];
+              for (const suite of suites) {
+                for (const test of (suite.assertionResults || [])) {
+                  if (test.retryReasons && test.retryReasons.length > 0) {
+                    flaky.push({ name: test.fullName || test.title, retries: test.retryReasons.length });
+                  }
+                }
+              }
+              if (flaky.length > 0) {
+                let md = '### Flaky Tests Detected\n\n';
+                md += '| Test | Retries |\n| --- | --- |\n';
+                for (const t of flaky) {
+                  md += '| ' + t.name + ' | ' + t.retries + ' |\n';
+                }
+                md += '\n> These tests passed after retrying. Investigate and stabilise them.\n';
+                fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY || '/dev/null', md);
+                console.log('WARNING: ' + flaky.length + ' flaky test(s) detected');
+              } else {
+                console.log('No flaky tests detected.');
+              }
+            "
+          fi
+
+      - name: Check knip
+        run: pnpm knip || true
+
+      - name: Build with timing
+        run: |
+          BUILD_START=$(date +%s)
+          pnpm build
+          BUILD_END=$(date +%s)
+          BUILD_DURATION=$((BUILD_END - BUILD_START))
+          echo "### Build Performance" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Metric | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Build duration | ${BUILD_DURATION}s |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Node version | $(node -v) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| pnpm version | $(pnpm -v) |" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            app/test-results/
+            app/coverage/json-summary/
+          retention-days: 30
 
       - name: Check AGENTS.md references valid paths
         run: |

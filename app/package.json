@@ -8,7 +8,7 @@
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run --reporter=default --reporter=junit --outputFile.junit=./test-results/junit.xml",
+    "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",

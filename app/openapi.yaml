@@ -1,0 +1,1424 @@
+openapi: 3.1.0
+info:
+  title: Vitruvian Fitness Tracker API
+  description: |
+    REST API for the Vitruvian personal fitness tracker.
+    All endpoints require Supabase authentication (cookie-based session).
+    Routes are served under the Next.js App Router at `/api/`.
+  version: 1.0.0
+  contact:
+    name: Vitruvian
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development
+  - url: https://vitruvian.vercel.app/api
+    description: Production
+
+security:
+  - supabaseCookie: []
+
+tags:
+  - name: Sessions
+    description: Workout session and set logging
+  - name: Exercises
+    description: Exercise history and personal records
+  - name: Body Composition
+    description: Body composition tracking (weight, body fat, etc.)
+  - name: Measurements
+    description: Body measurements (shoulders, waist, etc.)
+  - name: Supplements
+    description: Supplement management and intake logging
+  - name: Programme
+    description: Training programme days and exercises
+  - name: Notifications
+    description: In-app notification system
+  - name: AI
+    description: AI-powered chat, workout parsing, and insights
+  - name: Dashboard
+    description: Aggregated stats for the dashboard
+  - name: Working Weights
+    description: Current working weights per exercise
+
+paths:
+  /sessions:
+    get:
+      operationId: listSessions
+      tags: [Sessions]
+      summary: List recent workout sessions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of sessions to return
+      responses:
+        "200":
+          description: Array of recent sessions with their sets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+    post:
+      operationId: createSession
+      tags: [Sessions]
+      summary: Create a workout session with optional sets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "201":
+          description: Session created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                required: [id]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /sessions/{id}:
+    get:
+      operationId: getSession
+      tags: [Sessions]
+      summary: Get a single session by ID
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      responses:
+        "200":
+          description: Session with sets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /exercises:
+    get:
+      operationId: getExerciseData
+      tags: [Exercises]
+      summary: Get exercise history or personal records
+      description: |
+        Must provide either `exercise` (name) or `prs=true`.
+        Returns 400 if neither is provided.
+      parameters:
+        - name: exercise
+          in: query
+          schema:
+            type: string
+          description: Exercise name to look up history for
+        - name: prs
+          in: query
+          schema:
+            type: string
+            enum: ["true"]
+          description: Set to "true" to return all personal records
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Max rows for exercise history
+      responses:
+        "200":
+          description: Exercise history or personal records
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/ExerciseHistoryRow"
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/PersonalRecord"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /body-comp:
+    get:
+      operationId: getBodyComp
+      tags: [Body Composition]
+      summary: Get body composition history or latest entry
+      parameters:
+        - name: latest
+          in: query
+          schema:
+            type: string
+            enum: ["true"]
+          description: Set to "true" for only the latest entry
+      responses:
+        "200":
+          description: Body composition data
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/BodyComp"
+                  - $ref: "#/components/schemas/BodyComp"
+    post:
+      operationId: createBodyComp
+      tags: [Body Composition]
+      summary: Record a body composition entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBodyCompRequest"
+      responses:
+        "201":
+          description: Entry created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /measurements:
+    get:
+      operationId: getMeasurements
+      tags: [Measurements]
+      summary: Get measurement history or latest entry
+      parameters:
+        - name: latest
+          in: query
+          schema:
+            type: string
+            enum: ["true"]
+          description: Set to "true" for only the latest entry
+      responses:
+        "200":
+          description: Measurement data
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/Measurement"
+                  - $ref: "#/components/schemas/Measurement"
+    post:
+      operationId: createMeasurement
+      tags: [Measurements]
+      summary: Record body measurements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateMeasurementRequest"
+      responses:
+        "201":
+          description: Measurement recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /supplements:
+    get:
+      operationId: listSupplements
+      tags: [Supplements]
+      summary: List supplements (active only by default)
+      parameters:
+        - name: all
+          in: query
+          schema:
+            type: string
+            enum: ["true"]
+          description: Set to "true" to include inactive supplements
+      responses:
+        "200":
+          description: Array of supplements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Supplement"
+    post:
+      operationId: createSupplement
+      tags: [Supplements]
+      summary: Add a new supplement
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSupplementRequest"
+      responses:
+        "201":
+          description: Supplement created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                required: [id]
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /supplements/{id}:
+    patch:
+      operationId: updateSupplement
+      tags: [Supplements]
+      summary: Update a supplement
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSupplementRequest"
+      responses:
+        "200":
+          description: Supplement updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /supplements/log:
+    get:
+      operationId: getSupplementLog
+      tags: [Supplements]
+      summary: Get supplement intake log for a date or date range
+      parameters:
+        - name: date
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Single date (YYYY-MM-DD). Defaults to today.
+        - name: start
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Range start (YYYY-MM-DD). Use with `end`.
+        - name: end
+          in: query
+          schema:
+            type: string
+            format: date
+          description: Range end (YYYY-MM-DD). Use with `start`.
+      responses:
+        "200":
+          description: Array of supplement log entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SupplementLogEntry"
+    post:
+      operationId: logSupplementIntake
+      tags: [Supplements]
+      summary: Log or toggle supplement intake
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LogSupplementRequest"
+      responses:
+        "201":
+          description: Intake logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OkResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /supplements/stats:
+    get:
+      operationId: getSupplementStats
+      tags: [Supplements]
+      summary: Get supplement streaks and compliance stats
+      parameters:
+        - name: days
+          in: query
+          schema:
+            type: integer
+            default: 30
+          description: Number of days for compliance calculation
+      responses:
+        "200":
+          description: Streaks and compliance data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SupplementStats"
+
+  /programme:
+    get:
+      operationId: getProgramme
+      tags: [Programme]
+      summary: Get programme days, or a single day with exercises
+      parameters:
+        - name: day
+          in: query
+          schema:
+            type: integer
+          description: Day number. Omit to list all days.
+      responses:
+        "200":
+          description: Programme day(s)
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      $ref: "#/components/schemas/ProgrammeDay"
+                  - $ref: "#/components/schemas/ProgrammeDayWithExercises"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /working-weights:
+    get:
+      operationId: listWorkingWeights
+      tags: [Working Weights]
+      summary: Get all current working weights
+      responses:
+        "200":
+          description: Array of working weights per exercise
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WorkingWeight"
+
+  /stats:
+    get:
+      operationId: getDashboardStats
+      tags: [Dashboard]
+      summary: Get aggregated dashboard statistics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardStats"
+
+  /notifications/preferences:
+    get:
+      operationId: getNotificationPreferences
+      tags: [Notifications]
+      summary: Get notification preferences
+      responses:
+        "200":
+          description: Current preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    $ref: "#/components/schemas/NotificationPreferences"
+        "500":
+          $ref: "#/components/responses/InternalError"
+    patch:
+      operationId: updateNotificationPreferences
+      tags: [Notifications]
+      summary: Update notification preferences
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NotificationPreferencesUpdate"
+      responses:
+        "200":
+          description: Updated preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    $ref: "#/components/schemas/NotificationPreferences"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /notifications/unread:
+    get:
+      operationId: getUnreadCount
+      tags: [Notifications]
+      summary: Get count of unread notifications
+      responses:
+        "200":
+          description: Unread count
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                required: [count]
+
+  /notifications/history:
+    get:
+      operationId: getNotificationHistory
+      tags: [Notifications]
+      summary: Get notification history
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 100
+          description: Max notifications to return
+        - name: type
+          in: query
+          schema:
+            type: string
+          description: Filter by notification type
+      responses:
+        "200":
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  notifications:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Notification"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /notifications/clicked:
+    post:
+      operationId: markNotificationClicked
+      tags: [Notifications]
+      summary: Mark a notification as clicked/read
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                notificationId:
+                  type: integer
+              required: [notificationId]
+      responses:
+        "200":
+          description: Notification marked as clicked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /ai/chat:
+    post:
+      operationId: aiChat
+      tags: [AI]
+      summary: Send a message to the AI assistant (SSE stream)
+      description: |
+        Returns a Server-Sent Events stream. Each event is a JSON object
+        with a `type` field: `session_info`, `text_delta`, `tool_use`,
+        `tool_result`, `turn_complete`, or `error`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatRequest"
+      responses:
+        "200":
+          description: SSE stream of chat events
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /ai/sessions:
+    get:
+      operationId: listAISessions
+      tags: [AI]
+      summary: List AI chat sessions
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+            maximum: 50
+      responses:
+        "200":
+          description: Array of AI sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AISession"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /ai/sessions/{id}:
+    patch:
+      operationId: updateAISession
+      tags: [AI]
+      summary: Update an AI session title
+      parameters:
+        - $ref: "#/components/parameters/ResourceId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  maxLength: 100
+      responses:
+        "200":
+          description: Session updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /ai/parse-workout:
+    post:
+      operationId: parseWorkout
+      tags: [AI]
+      summary: Parse free-text workout description into structured data
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                  description: Free-text workout description
+              required: [text]
+      responses:
+        "200":
+          description: Parsed workout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ParsedWorkout"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          description: Could not parse workout from input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          $ref: "#/components/responses/InternalError"
+
+  /ai/insights:
+    get:
+      operationId: getAIInsights
+      tags: [AI]
+      summary: Get AI-generated training insights
+      description: Returns cached insights if available, otherwise generates new ones.
+      responses:
+        "200":
+          description: Insights array
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  insights:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AIInsight"
+                  cached:
+                    type: boolean
+                  error:
+                    type: string
+                required: [insights, cached]
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+components:
+  securitySchemes:
+    supabaseCookie:
+      type: apiKey
+      in: cookie
+      name: sb-access-token
+      description: Supabase session cookie set by the auth flow
+
+  parameters:
+    ResourceId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Resource ID
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    InternalError:
+      description: Server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required: [error]
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          const: true
+      required: [success]
+
+    OkResponse:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          const: true
+      required: [ok]
+
+    Session:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: string
+          format: uuid
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+        programme:
+          type: string
+          nullable: true
+        block:
+          type: string
+          nullable: true
+        week:
+          type: integer
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        sets:
+          type: array
+          items:
+            $ref: "#/components/schemas/Set"
+      required: [id, date, name]
+
+    Set:
+      type: object
+      properties:
+        id:
+          type: integer
+        session_id:
+          type: integer
+        exercise:
+          type: string
+        set_number:
+          type: integer
+        reps:
+          type: integer
+        weight:
+          type: number
+        weight_unit:
+          type: string
+          default: lbs
+        rpe:
+          type: number
+          nullable: true
+        duration_sec:
+          type: integer
+          nullable: true
+        is_calibration:
+          type: boolean
+        notes:
+          type: string
+          nullable: true
+      required: [id, session_id, exercise, set_number, reps, weight]
+
+    CreateSessionRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        name:
+          type: string
+        programme:
+          type: string
+        block:
+          type: string
+        week:
+          type: integer
+        notes:
+          type: string
+        sets:
+          type: array
+          items:
+            type: object
+            properties:
+              exercise:
+                type: string
+              set_number:
+                type: integer
+              reps:
+                type: integer
+              weight:
+                type: number
+              weight_unit:
+                type: string
+                default: lbs
+              rpe:
+                type: number
+              duration_sec:
+                type: integer
+              is_calibration:
+                type: boolean
+              notes:
+                type: string
+            required: [exercise, set_number, reps, weight]
+      required: [date, name]
+
+    ExerciseHistoryRow:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        exercise:
+          type: string
+        set_number:
+          type: integer
+        reps:
+          type: integer
+        weight:
+          type: number
+        weight_unit:
+          type: string
+        rpe:
+          type: number
+          nullable: true
+
+    PersonalRecord:
+      type: object
+      properties:
+        exercise:
+          type: string
+        best_weight:
+          type: number
+        best_reps:
+          type: integer
+        best_set_date:
+          type: string
+          format: date
+
+    BodyComp:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        weight_lbs:
+          type: number
+          nullable: true
+        body_fat_pct:
+          type: number
+          nullable: true
+        lean_mass_lbs:
+          type: number
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    CreateBodyCompRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        weight_lbs:
+          type: number
+        body_fat_pct:
+          type: number
+        lean_mass_lbs:
+          type: number
+        notes:
+          type: string
+      required: [date]
+
+    Measurement:
+      type: object
+      properties:
+        id:
+          type: integer
+        date:
+          type: string
+          format: date
+        weight_lbs:
+          type: number
+          nullable: true
+        body_fat_pct:
+          type: number
+          nullable: true
+        shoulders:
+          type: number
+          nullable: true
+        chest:
+          type: number
+          nullable: true
+        waist:
+          type: number
+          nullable: true
+        hips:
+          type: number
+          nullable: true
+        bicep_l:
+          type: number
+          nullable: true
+        bicep_r:
+          type: number
+          nullable: true
+        thigh_l:
+          type: number
+          nullable: true
+        thigh_r:
+          type: number
+          nullable: true
+        calf_l:
+          type: number
+          nullable: true
+        calf_r:
+          type: number
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+
+    CreateMeasurementRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        weight_lbs:
+          type: number
+        body_fat_pct:
+          type: number
+        shoulders:
+          type: number
+        chest:
+          type: number
+        waist:
+          type: number
+        hips:
+          type: number
+        bicep_l:
+          type: number
+        bicep_r:
+          type: number
+        thigh_l:
+          type: number
+        thigh_r:
+          type: number
+        calf_l:
+          type: number
+        calf_r:
+          type: number
+      required: [date]
+
+    Supplement:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        amount:
+          type: string
+          nullable: true
+        units:
+          type: string
+          nullable: true
+        time_of_day:
+          type: string
+          nullable: true
+        frequency:
+          type: string
+          nullable: true
+        active:
+          type: integer
+          description: "1 = active, 0 = inactive"
+        notes:
+          type: string
+          nullable: true
+      required: [id, name, active]
+
+    CreateSupplementRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: string
+        units:
+          type: string
+        time_of_day:
+          type: string
+        frequency:
+          type: string
+        notes:
+          type: string
+      required: [name]
+
+    UpdateSupplementRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        amount:
+          type: string
+        units:
+          type: string
+        time_of_day:
+          type: string
+        frequency:
+          type: string
+        active:
+          type: boolean
+        notes:
+          type: string
+      minProperties: 1
+
+    SupplementLogEntry:
+      type: object
+      properties:
+        id:
+          type: integer
+        supplement_id:
+          type: integer
+        date:
+          type: string
+          format: date
+        taken:
+          type: integer
+          description: "1 = taken, 0 = not taken"
+        time_taken:
+          type: string
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+        supplement_name:
+          type: string
+
+    LogSupplementRequest:
+      type: object
+      properties:
+        supplement_id:
+          type: integer
+        date:
+          type: string
+          format: date
+          description: Defaults to today
+        taken:
+          oneOf:
+            - type: boolean
+            - type: integer
+              enum: [0, 1]
+        time_taken:
+          type: string
+        notes:
+          type: string
+      required: [supplement_id]
+
+    SupplementStats:
+      type: object
+      properties:
+        streaks:
+          type: array
+          items:
+            type: object
+            properties:
+              supplement_id:
+                type: integer
+              name:
+                type: string
+              current_streak:
+                type: integer
+              longest_streak:
+                type: integer
+        compliance:
+          type: array
+          items:
+            type: object
+            properties:
+              supplement_id:
+                type: integer
+              name:
+                type: string
+              days_taken:
+                type: integer
+              days_total:
+                type: integer
+              rate:
+                type: number
+
+    ProgrammeDay:
+      type: object
+      properties:
+        id:
+          type: integer
+        day_number:
+          type: integer
+        name:
+          type: string
+        focus:
+          type: string
+          nullable: true
+
+    ProgrammeDayWithExercises:
+      allOf:
+        - $ref: "#/components/schemas/ProgrammeDay"
+        - type: object
+          properties:
+            exercises:
+              type: array
+              items:
+                $ref: "#/components/schemas/ProgrammeExercise"
+
+    ProgrammeExercise:
+      type: object
+      properties:
+        id:
+          type: integer
+        day_id:
+          type: integer
+        exercise:
+          type: string
+        sets:
+          type: integer
+        reps:
+          type: string
+        target_weight:
+          type: number
+          nullable: true
+        weight_unit:
+          type: string
+          nullable: true
+        target_rpe:
+          type: number
+          nullable: true
+        is_warmup:
+          type: integer
+          description: "1 = warmup, 0 = working set"
+        superset_group:
+          type: string
+          nullable: true
+        exercise_order:
+          type: integer
+        notes:
+          type: string
+          nullable: true
+
+    WorkingWeight:
+      type: object
+      properties:
+        id:
+          type: integer
+        exercise:
+          type: string
+        weight:
+          type: number
+        weight_unit:
+          type: string
+        updated_at:
+          type: string
+          format: date-time
+
+    DashboardStats:
+      type: object
+      properties:
+        bodyComp:
+          $ref: "#/components/schemas/BodyComp"
+        measurements:
+          $ref: "#/components/schemas/Measurement"
+        swRatio:
+          type: string
+          nullable: true
+          description: Shoulder-to-waist ratio (3 decimal places)
+        streak:
+          type: integer
+          description: Current consecutive-day workout streak
+        totalSessions:
+          type: integer
+        recentSessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Session"
+
+    NotificationPreferences:
+      type: object
+      properties:
+        supplements_enabled:
+          type: boolean
+        supplements_time:
+          type: string
+        workout_enabled:
+          type: boolean
+        workout_time:
+          type: string
+        body_comp_enabled:
+          type: boolean
+        body_comp_day:
+          type: string
+        body_comp_time:
+          type: string
+        quiet_hours_start:
+          type: string
+        quiet_hours_end:
+          type: string
+        timezone:
+          type: string
+
+    NotificationPreferencesUpdate:
+      type: object
+      properties:
+        supplements_enabled:
+          type: boolean
+        supplements_time:
+          type: string
+        workout_enabled:
+          type: boolean
+        workout_time:
+          type: string
+        body_comp_enabled:
+          type: boolean
+        body_comp_day:
+          type: string
+        body_comp_time:
+          type: string
+        quiet_hours_start:
+          type: string
+        quiet_hours_end:
+          type: string
+        timezone:
+          type: string
+      minProperties: 1
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+        title:
+          type: string
+        body:
+          type: string
+        read:
+          type: boolean
+        clicked:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    ChatRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        sessionId:
+          type: string
+          description: Existing AI session ID to resume
+      required: [message]
+
+    AISession:
+      type: object
+      properties:
+        id:
+          type: integer
+        droid_session_id:
+          type: string
+        title:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        last_active_at:
+          type: string
+          format: date-time
+
+    ParsedWorkout:
+      type: object
+      properties:
+        session:
+          type: object
+          properties:
+            date:
+              type: string
+              format: date
+            name:
+              type: string
+            programme:
+              type: string
+            block:
+              type: string
+            week:
+              type: integer
+          required: [date, name]
+        sets:
+          type: array
+          items:
+            type: object
+            properties:
+              exercise:
+                type: string
+              set_number:
+                type: integer
+              reps:
+                type: integer
+              weight:
+                type: number
+              weight_unit:
+                type: string
+              rpe:
+                type: number
+              notes:
+                type: string
+            required: [exercise, set_number, reps, weight, weight_unit]
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+        ambiguities:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              options:
+                type: array
+                items:
+                  type: string
+      required: [session, sets, confidence]
+
+    AIInsight:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [volume_trend, plateau_alert, body_comp, compliance]
+        title:
+          type: string
+        content:
+          type: string
+        severity:
+          type: string
+          enum: [info, warning, success]
+      required: [type, title, content]

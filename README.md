@@ -46,6 +46,24 @@ NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_...
 ```
 
+### Local Database (optional)
+
+To run Postgres locally instead of using hosted Supabase:
+
+```bash
+docker compose up -d          # starts Postgres on port 54322 + Studio on 54323
+```
+
+The schema in `app/supabase/schema.sql` is automatically applied on first start.
+Point your `.env.local` at `http://localhost:54321` when using local Supabase, or
+connect directly to Postgres on port `54322` (user: `postgres`, password: `postgres`).
+
+### Dev Container
+
+Open this repo in VS Code or GitHub Codespaces to get a pre-configured environment
+with Node.js 22, pnpm, gh CLI, and recommended extensions (ESLint, Prettier,
+Tailwind CSS IntelliSense, Playwright, Vitest).
+
 ## Design
 
 Dark theme with a classical/terminal hybrid aesthetic. Three-font system:
@@ -62,4 +80,6 @@ Email/password authentication via Supabase Auth. All tables have `user_id` colum
 
 ## Database
 
-10 tables: `sessions`, `sets`, `body_comp`, `measurements`, `working_weights`, `milestones`, `programme_days`, `programme_exercises`, `supplements`, `supplement_log`. Schema managed via Supabase migrations.
+14 tables covering training, body composition, supplements, AI chat, and notifications.
+Full schema definition: [`app/supabase/schema.sql`](app/supabase/schema.sql).
+All tables use RLS with `auth.uid() = user_id` policies and `BEFORE INSERT` triggers.

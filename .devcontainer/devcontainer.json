@@ -1,0 +1,30 @@
+{
+  "name": "Vitruvian",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/pnpm:2": {}
+  },
+  "forwardPorts": [3000, 54321, 54322],
+  "postCreateCommand": "cd app && pnpm install --frozen-lockfile",
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true,
+        "typescript.tsdk": "app/node_modules/typescript/lib"
+      },
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright",
+        "vitest.explorer"
+      ]
+    }
+  },
+  "remoteEnv": {
+    "NEXT_PUBLIC_SUPABASE_URL": "${localEnv:NEXT_PUBLIC_SUPABASE_URL}",
+    "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": "${localEnv:NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}"
+  }
+}
