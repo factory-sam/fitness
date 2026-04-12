@@ -1,0 +1,20 @@
+# Default owner for everything
+* @factory-sam
+
+# App source code
+/app/src/ @factory-sam
+
+# CI/CD and workflows
+/.github/ @factory-sam
+
+# Documentation
+/AGENTS.md @factory-sam
+/README.md @factory-sam
+/docs/ @factory-sam
+/droid-wiki/ @factory-sam
+
+# Infrastructure and config
+/app/next.config.ts @factory-sam
+/app/eslint.config.mjs @factory-sam
+/app/vitest.config.ts @factory-sam
+/app/playwright.config.ts @factory-sam

@@ -1,0 +1,52 @@
+name: Semgrep Security Scan
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    container:
+      image: semgrep/semgrep
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Semgrep
+        run: |
+          semgrep scan \
+            --config auto \
+            --config p/typescript \
+            --config p/nextjs \
+            --config p/react \
+            --sarif \
+            --output semgrep-results.sarif \
+            app/src/
+        continue-on-error: true
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+        continue-on-error: true
+
+      - name: Run Semgrep (readable report)
+        run: |
+          echo "## Semgrep Security Report" > /tmp/report.md
+          echo "" >> /tmp/report.md
+          semgrep scan \
+            --config auto \
+            --config p/typescript \
+            --config p/nextjs \
+            --config p/react \
+            --text \
+            app/src/ 2>&1 | tee -a /tmp/report.md || true
+          echo "" >> /tmp/report.md
+          echo "---" >> /tmp/report.md
+          echo "*Scanned with Semgrep (typescript, nextjs, react rulesets)*" >> /tmp/report.md
+          cat /tmp/report.md
