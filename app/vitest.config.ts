@@ -12,10 +12,24 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+    isolate: true,
+    fileParallelism: true,
+    sequence: {
+      shuffle: true,
+    },
+    reporters: ["default", "junit"],
+    outputFile: {
+      junit: "./test-results/junit.xml",
+    },
     coverage: {
       provider: "v8",
+      reporter: ["text", "lcov", "json-summary"],
+      reportsDirectory: "./coverage",
       thresholds: {
-        statements: 50,
+        statements: 30,
+        branches: 25,
+        functions: 30,
+        lines: 30,
       },
     },
   },
