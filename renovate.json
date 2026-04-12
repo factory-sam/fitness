@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "minimumReleaseAge": "3 days",
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
+    {
+      "matchUpdateTypes": ["major"],
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "matchPackageNames": ["next", "react", "react-dom"],
+      "groupName": "React & Next.js",
+      "minimumReleaseAge": "7 days"
+    },
+    {
+      "matchPackageNames": ["@supabase/ssr", "@supabase/supabase-js"],
+      "groupName": "Supabase"
+    }
+  ]
+}
