@@ -486,3 +486,89 @@ export async function getProgrammeExercises(dayId: number) {
     .order("exercise_order");
   return data ?? [];
 }
+
+// --- AI Sessions ---
+
+export async function getAISessions(limit = 20) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_sessions")
+    .select("*")
+    .order("last_active_at", { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+export async function getAISessionByDroidId(droidSessionId: string) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_sessions")
+    .select("*")
+    .eq("droid_session_id", droidSessionId)
+    .single();
+  return data;
+}
+
+export async function createAISessionRecord(droidSessionId: string, title?: string) {
+  const supabase = await getSupabase();
+  const { data, error } = await supabase
+    .from("ai_sessions")
+    .insert({
+      droid_session_id: droidSessionId,
+      title: title ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data!.id;
+}
+
+export async function updateAISessionTitle(id: number, title: string) {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("ai_sessions").update({ title }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function touchAISession(id: number) {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("ai_sessions")
+    .update({ last_active_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// --- AI Insights ---
+
+export async function getCachedInsights() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_insights")
+    .select("*")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+export async function cacheInsights(
+  insights: { type: string; content: Record<string, unknown> }[],
+  contextHash?: string,
+) {
+  const supabase = await getSupabase();
+  const rows = insights.map((insight) => ({
+    type: insight.type,
+    content: insight.content,
+    context_hash: contextHash ?? null,
+  }));
+  const { error } = await supabase.from("ai_insights").insert(rows);
+  if (error) throw error;
+}
+
+export async function clearExpiredInsights() {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("ai_insights")
+    .delete()
+    .lt("expires_at", new Date().toISOString());
+  if (error) throw error;
+}
