@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 const links = [
   { href: "/", label: "Dashboard", icon: "◈" },
@@ -15,6 +16,28 @@ const links = [
 
 export function Nav() {
   const pathname = usePathname();
+  const [unread, setUnread] = useState(0);
+
+  useEffect(() => {
+    fetch("/api/notifications/unread")
+      .then((r) => r.json())
+      .then((d) => setUnread(d.count ?? 0))
+      .catch(() => {});
+
+    const interval = setInterval(() => {
+      fetch("/api/notifications/unread")
+        .then((r) => r.json())
+        .then((d) => setUnread(d.count ?? 0))
+        .catch(() => {});
+    }, 60_000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const displayUnread = useMemo(
+    () => (pathname === "/notifications" ? 0 : unread),
+    [pathname, unread],
+  );
 
   return (
     <nav className="w-48 min-h-screen border-r border-border bg-bg-card flex flex-col py-6 pb-10 px-3 shrink-0">
@@ -33,6 +56,11 @@ export function Nav() {
           >
             <span className="text-xs opacity-50">{link.icon}</span>
             {link.label}
+            {link.href === "/notifications" && displayUnread > 0 && (
+              <span className="ml-auto type-micro bg-gold text-bg rounded-full px-1.5 py-0.5 leading-none">
+                {displayUnread > 99 ? "99+" : displayUnread}
+              </span>
+            )}
           </Link>
         ))}
       </div>
