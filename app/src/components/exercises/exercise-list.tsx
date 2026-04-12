@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EmptyState } from "../ui/empty-state";
 
 interface LoggedExercise {
   exercise: string;
@@ -81,8 +82,27 @@ export function ExerciseList({
             })}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center text-text-muted py-8">
-                  No exercises found
+                <td colSpan={5}>
+                  {search ? (
+                    <div className="text-center text-text-muted py-8">
+                      <p className="font-mono text-sm">
+                        No exercises matching &ldquo;{search}&rdquo;
+                      </p>
+                      <button
+                        onClick={() => setSearch("")}
+                        className="font-mono text-xs text-gold hover:text-gold-bright mt-2 transition-colors"
+                      >
+                        Clear search
+                      </button>
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="≡"
+                      title="No exercises in your library"
+                      description="Exercises appear here from your programme and logged workouts. Set up a training programme to populate your exercise library."
+                      action={{ label: "Set Up Programme", href: "/programme" }}
+                    />
+                  )}
                 </td>
               </tr>
             )}

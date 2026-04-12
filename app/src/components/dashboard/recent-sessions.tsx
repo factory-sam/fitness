@@ -1,3 +1,5 @@
+import { EmptyState } from "../ui/empty-state";
+
 interface Session {
   id?: number;
   date?: string;
@@ -14,13 +16,13 @@ export function RecentSessions({ sessions }: { sessions: Session[] }) {
     return (
       <div className="card">
         <h2 className="section-heading mb-4">Recent Sessions</h2>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <span className="text-4xl mb-3 opacity-20">▶</span>
-          <p className="font-mono text-sm text-text-secondary">No sessions logged yet</p>
-          <p className="font-mono text-xs text-text-muted mt-1">
-            Complete your first workout to see it here
-          </p>
-        </div>
+        <EmptyState
+          icon="▶"
+          title="No sessions logged yet"
+          description="Your recent workout sessions will appear here. Log your first workout to start tracking progress."
+          action={{ label: "Start Workout", href: "/workout" }}
+          secondaryAction={{ label: "Set Up Programme", href: "/programme" }}
+        />
       </div>
     );
   }

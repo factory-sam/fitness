@@ -60,7 +60,7 @@ export function ManageStack({
   }) => void;
   onUpdate: (id: number, data: Partial<Supplement>) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(supplements.length === 0);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({

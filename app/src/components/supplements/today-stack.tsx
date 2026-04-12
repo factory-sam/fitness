@@ -67,9 +67,17 @@ export function TodayStack({
       </div>
 
       {grouped.length === 0 && (
-        <p className="font-mono text-sm text-text-muted py-8 text-center">
-          No supplements configured. Add your stack below.
-        </p>
+        <div className="flex flex-col items-center justify-center text-center py-8">
+          <span className="font-mono text-xl opacity-20 mb-2">⊕</span>
+          <p className="font-mono text-sm text-text-secondary">No supplements configured</p>
+          <p className="font-mono text-xs text-text-muted mt-1 max-w-xs">
+            Track your daily supplement intake — vitamins, creatine, protein, and more. Add
+            supplements in the Manage Stack section below.
+          </p>
+          <span className="font-mono text-xs text-gold mt-3 animate-pulse">
+            ↓ Scroll down to add supplements
+          </span>
+        </div>
       )}
 
       {grouped.map((group) => (
