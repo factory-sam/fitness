@@ -669,8 +669,8 @@ export async function clearExpiredInsights() {
 
 export async function upsertPushSubscription(sub: {
   endpoint: string;
-  p256dh_key: string;
-  auth_key: string;
+  p256dh: string;
+  auth_token: string;
   user_agent?: string;
 }) {
   const supabase = await getSupabase();
