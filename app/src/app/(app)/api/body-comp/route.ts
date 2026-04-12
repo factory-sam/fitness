@@ -1,4 +1,5 @@
 import { getBodyCompHistory, getLatestBodyComp, createBodyComp } from "../../../../lib/queries";
+import log from "../../../../lib/logger";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -12,7 +13,13 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  await createBodyComp(body);
-  return Response.json({ success: true }, { status: 201 });
+  try {
+    const body = await request.json();
+    await createBodyComp(body);
+    log.info({ date: body.date }, "body comp entry created");
+    return Response.json({ success: true }, { status: 201 });
+  } catch (err) {
+    log.error({ err }, "failed to create body comp entry");
+    return Response.json({ error: "Failed to create body comp entry" }, { status: 500 });
+  }
 }

@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
+import log from "../../lib/logger";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -37,6 +38,7 @@ export async function updateSession(request: NextRequest) {
     request.nextUrl.pathname.startsWith("/auth");
 
   if (!user && !isAuthRoute) {
+    log.debug({ path: request.nextUrl.pathname }, "unauthenticated request, redirecting to login");
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
