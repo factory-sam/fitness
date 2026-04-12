@@ -25,6 +25,7 @@ export function useChat() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const hasAutoTitled = useRef(false);
 
   const sendMessage = useCallback(
     async (text: string) => {
@@ -132,6 +133,25 @@ export function useChat() {
                 break;
               case "turn_complete":
                 setIsStreaming(false);
+                if (!hasAutoTitled.current && userMsg.content) {
+                  hasAutoTitled.current = true;
+                  const title = userMsg.content.slice(0, 50);
+                  fetch("/api/ai/sessions", { method: "GET" })
+                    .then((r) => r.json())
+                    .then((sessions: { id: number; droid_session_id: string }[]) => {
+                      const match = sessions.find(
+                        (s: { droid_session_id: string }) => s.droid_session_id === event.sessionId,
+                      );
+                      if (match) {
+                        fetch(`/api/ai/sessions/${match.id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ title }),
+                        }).catch(() => {});
+                      }
+                    })
+                    .catch(() => {});
+                }
                 break;
               case "error":
                 setError(event.message);

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { ChatMessages } from "./chat-messages";
 import { ChatInput } from "./chat-input";
+import { ChatHistory } from "./chat-history";
 import { useChat } from "./use-chat";
 
 export function ChatSidebar() {
@@ -10,7 +11,28 @@ export function ChatSidebar() {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("vitruvian-chat-open") === "true";
   });
-  const { messages, isStreaming, error, sendMessage, interrupt, clearChat } = useChat();
+  const {
+    messages,
+    sessionId,
+    isStreaming,
+    error,
+    sendMessage,
+    interrupt,
+    clearChat,
+    setSessionId,
+    setMessages,
+  } = useChat();
+
+  const handleSelectSession = useCallback(
+    (droidSessionId: string) => {
+      setMessages([]);
+      setSessionId(droidSessionId);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("vitruvian-chat-session", droidSessionId);
+      }
+    },
+    [setMessages, setSessionId],
+  );
 
   const toggleOpen = useCallback(() => {
     setIsOpen((prev) => {
@@ -46,24 +68,19 @@ export function ChatSidebar() {
         <div className="flex items-center justify-between px-3 py-2.5 border-b border-border">
           <div className="flex items-center gap-2">
             <span className="text-gold text-sm">&#9672;</span>
-            <span className="font-serif text-sm text-text">Vitruvian AI</span>
+            <ChatHistory
+              currentSessionId={sessionId}
+              onSelectSession={handleSelectSession}
+              onNewChat={clearChat}
+            />
           </div>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={clearChat}
-              className="type-micro text-text-muted hover:text-text px-1.5 py-0.5"
-              title="New chat"
-            >
-              +
-            </button>
-            <button
-              onClick={toggleOpen}
-              className="type-micro text-text-muted hover:text-text px-1.5 py-0.5"
-              title="Close (Cmd+K)"
-            >
-              &#x2715;
-            </button>
-          </div>
+          <button
+            onClick={toggleOpen}
+            className="type-micro text-text-muted hover:text-text px-1.5 py-0.5"
+            title="Close (Cmd+K)"
+          >
+            &#x2715;
+          </button>
         </div>
 
         {/* Error banner */}
