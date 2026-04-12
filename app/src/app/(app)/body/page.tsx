@@ -6,6 +6,7 @@ import {
 } from "../../../lib/queries";
 import { BodyCompChart } from "../../../components/dashboard/body-comp-chart";
 import { MeasurementDisplay } from "../../../components/body/measurement-display";
+import { LogWeighIn } from "../../../components/body/log-weigh-in";
 
 export const dynamic = "force-dynamic";
 
@@ -22,11 +23,14 @@ export default async function BodyPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-6 pb-12">
-      <header>
-        <h1 className="type-heading text-text">Body & Measurements</h1>
-        <p className="font-mono text-xs text-text-muted mt-1">
-          Track composition and measurements monthly
-        </p>
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="type-heading text-text">Body & Measurements</h1>
+          <p className="font-mono text-xs text-text-muted mt-1">
+            Track composition and measurements monthly
+          </p>
+        </div>
+        <LogWeighIn />
       </header>
 
       {/* Current stats */}
