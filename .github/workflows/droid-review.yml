@@ -31,7 +31,6 @@ jobs:
       - name: Review PR
         env:
           FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr.diff
@@ -46,20 +45,17 @@ jobs:
 
           Skip stylistic concerns, minor optimizations, and architectural opinions.
 
-          After your review, use the gh CLI to post your findings:
+          After your review, use the gh CLI to post your findings.
 
-          If you find issues, post INLINE comments on the specific lines using:
+          If you find issues, post a review comment:
             gh api repos/factory-sam/fitness/pulls/${PR_NUMBER}/reviews \\
               --method POST \\
-              -f body='Review summary here' \\
-              -f event='COMMENT' \\
-              -f 'comments[][path]=file/path.ts' \\
-              -f 'comments[][position]=LINE_IN_DIFF' \\
-              -f 'comments[][body]=Issue description'
+              -f body='<your findings here>' \\
+              -f event='COMMENT'
 
           If no issues found, approve the PR:
             gh api repos/factory-sam/fitness/pulls/${PR_NUMBER}/reviews \\
               --method POST \\
-              -f body='Code review passed. No issues found.' \\
+              -f body='Code review passed. No bugs, security issues, or correctness problems found.' \\
               -f event='APPROVE'
           "
