@@ -103,6 +103,25 @@ export async function getAllWorkingWeights() {
   });
 }
 
+export async function upsertWorkingWeight(data: {
+  exercise: string;
+  weight: number;
+  weight_unit?: string;
+  source?: string;
+  notes?: string;
+}) {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("working_weights").insert({
+    exercise: data.exercise,
+    weight: data.weight,
+    weight_unit: data.weight_unit ?? "lbs",
+    date_set: getLocalDateString(),
+    source: data.source ?? "ai_agent",
+    notes: data.notes ?? null,
+  });
+  if (error) throw error;
+}
+
 export async function getExerciseHistory(exercise: string, limit = 50) {
   const supabase = await getSupabase();
   const { data } = await supabase
@@ -469,6 +488,79 @@ export async function getUntakenSupplementsToday() {
   return (active ?? []).filter((s) => !taken.has(s.id));
 }
 
+// --- Agent Query Helpers ---
+
+export async function getSessionsWithSets(days = 30) {
+  const supabase = await getSupabase();
+  const since = getLocalDateString(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("id, date, name, programme, block, week, notes")
+    .gte("date", since)
+    .order("date", { ascending: false });
+  if (!sessions || sessions.length === 0) return [];
+
+  const sessionIds = sessions.map((s) => s.id);
+  const { data: sets } = await supabase
+    .from("sets")
+    .select("session_id, exercise, set_number, reps, weight, weight_unit, rpe, duration_sec, notes")
+    .in("session_id", sessionIds)
+    .order("set_number");
+
+  const setsBySession = new Map<number, typeof sets>();
+  for (const set of sets ?? []) {
+    const list = setsBySession.get(set.session_id) ?? [];
+    list.push(set);
+    setsBySession.set(set.session_id, list);
+  }
+
+  return sessions.map((s) => ({
+    ...s,
+    sets: setsBySession.get(s.id) ?? [],
+  }));
+}
+
+export async function getBodyCompEntries(days = 90) {
+  const supabase = await getSupabase();
+  const since = getLocalDateString(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
+  const { data } = await supabase
+    .from("body_comp")
+    .select("date, weight_lbs, body_fat_pct, lean_mass_lbs, vo2_max, notes")
+    .gte("date", since)
+    .order("date", { ascending: false });
+  return data ?? [];
+}
+
+export async function getProgrammeWithExercises() {
+  const supabase = await getSupabase();
+  const { data: days } = await supabase
+    .from("programme_days")
+    .select("id, programme, day_number, day_name, focus")
+    .order("day_number");
+  if (!days || days.length === 0) return [];
+
+  const dayIds = days.map((d) => d.id);
+  const { data: exercises } = await supabase
+    .from("programme_exercises")
+    .select(
+      "day_id, exercise_order, exercise, sets, reps, target_rpe, rest_seconds, is_warmup, superset_group, notes",
+    )
+    .in("day_id", dayIds)
+    .order("exercise_order");
+
+  const exercisesByDay = new Map<number, typeof exercises>();
+  for (const ex of exercises ?? []) {
+    const list = exercisesByDay.get(ex.day_id) ?? [];
+    list.push(ex);
+    exercisesByDay.set(ex.day_id, list);
+  }
+
+  return days.map((d) => ({
+    ...d,
+    exercises: exercisesByDay.get(d.id) ?? [],
+  }));
+}
+
 // --- Programme ---
 
 export async function getProgrammeDays() {
@@ -485,4 +577,146 @@ export async function getProgrammeExercises(dayId: number) {
     .eq("day_id", dayId)
     .order("exercise_order");
   return data ?? [];
+}
+
+// --- AI Sessions ---
+
+export async function getAISessions(limit = 20) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_sessions")
+    .select("*")
+    .order("last_active_at", { ascending: false })
+    .limit(limit);
+  return data ?? [];
+}
+
+export async function getAISessionByDroidId(droidSessionId: string) {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_sessions")
+    .select("*")
+    .eq("droid_session_id", droidSessionId)
+    .single();
+  return data;
+}
+
+export async function createAISessionRecord(droidSessionId: string, title?: string) {
+  const supabase = await getSupabase();
+  const { data, error } = await supabase
+    .from("ai_sessions")
+    .insert({
+      droid_session_id: droidSessionId,
+      title: title ?? null,
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data!.id;
+}
+
+export async function updateAISessionTitle(id: number, title: string) {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("ai_sessions").update({ title }).eq("id", id);
+  if (error) throw error;
+}
+
+export async function touchAISession(id: number) {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("ai_sessions")
+    .update({ last_active_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// --- AI Insights ---
+
+export async function getCachedInsights() {
+  const supabase = await getSupabase();
+  const { data } = await supabase
+    .from("ai_insights")
+    .select("*")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false });
+  return data ?? [];
+}
+
+export async function cacheInsights(
+  insights: { type: string; content: Record<string, unknown> }[],
+  contextHash?: string,
+) {
+  const supabase = await getSupabase();
+  const rows = insights.map((insight) => ({
+    type: insight.type,
+    content: insight.content,
+    context_hash: contextHash ?? null,
+  }));
+  const { error } = await supabase.from("ai_insights").insert(rows);
+  if (error) throw error;
+}
+
+export async function clearExpiredInsights() {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("ai_insights")
+    .delete()
+    .lt("expires_at", new Date().toISOString());
+  if (error) throw error;
+}
+
+// --- Notification Preferences ---
+
+export async function getNotificationPreferences() {
+  const supabase = await getSupabase();
+  const { data } = await supabase.from("notification_preferences").select("*").maybeSingle();
+  return data;
+}
+
+export async function upsertNotificationPreferences(prefs: Record<string, unknown>) {
+  const supabase = await getSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .upsert({ user_id: user.id, ...prefs }, { onConflict: "user_id" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// --- Notification Log ---
+
+export async function getNotificationHistory(limit = 20, type?: string) {
+  const supabase = await getSupabase();
+  let query = supabase
+    .from("notification_log")
+    .select("*")
+    .order("sent_at", { ascending: false })
+    .limit(limit);
+  if (type) query = query.eq("type", type);
+  const { data } = await query;
+  return data ?? [];
+}
+
+export async function markNotificationClicked(notificationId: number) {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("notification_log")
+    .update({ clicked: true })
+    .eq("id", notificationId);
+  if (error) throw error;
+}
+
+export async function getUnreadNotificationCount() {
+  const supabase = await getSupabase();
+  const { count } = await supabase
+    .from("notification_log")
+    .select("id", { count: "exact", head: true })
+    .eq("clicked", false);
+  return count ?? 0;
 }

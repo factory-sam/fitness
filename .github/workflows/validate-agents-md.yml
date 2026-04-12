@@ -64,7 +64,7 @@ jobs:
           done
 
           # Verify key referenced files exist
-          for file in "lib/queries.ts" "utils/supabase/server.ts" "utils/supabase/client.ts" "utils/supabase/middleware.ts" "middleware.ts" "app/globals.css"; do
+          for file in "lib/queries.ts" "utils/supabase/server.ts" "utils/supabase/client.ts" "utils/supabase/middleware.ts" "proxy.ts" "app/globals.css"; do
             if [ ! -f "app/src/$file" ]; then
               echo "ERROR: AGENTS.md references src/$file but it does not exist"
               errors=$((errors + 1))

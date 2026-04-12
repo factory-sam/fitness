@@ -9,6 +9,7 @@ import {
   getProgrammeDays,
 } from "../../lib/queries";
 import { HeroStats } from "../../components/dashboard/hero-stats";
+import { InsightCards } from "../../components/dashboard/insight-cards";
 import { RecentSessions } from "../../components/dashboard/recent-sessions";
 import { ConsistencyCalendar } from "../../components/dashboard/consistency-calendar";
 import { PRBoard } from "../../components/dashboard/pr-board";
@@ -59,6 +60,9 @@ export default async function Dashboard() {
         untakenSupplements={untakenSupps.length}
         nextWorkoutDay={nextWorkoutDay}
       />
+
+      {/* AI Insights */}
+      <InsightCards />
 
       {/* Divider */}
       <div className="h-px bg-border my-8" />
