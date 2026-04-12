@@ -469,6 +469,79 @@ export async function getUntakenSupplementsToday() {
   return (active ?? []).filter((s) => !taken.has(s.id));
 }
 
+// --- Agent Query Helpers ---
+
+export async function getSessionsWithSets(days = 30) {
+  const supabase = await getSupabase();
+  const since = getLocalDateString(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
+  const { data: sessions } = await supabase
+    .from("sessions")
+    .select("id, date, name, programme, block, week, notes")
+    .gte("date", since)
+    .order("date", { ascending: false });
+  if (!sessions || sessions.length === 0) return [];
+
+  const sessionIds = sessions.map((s) => s.id);
+  const { data: sets } = await supabase
+    .from("sets")
+    .select("session_id, exercise, set_number, reps, weight, weight_unit, rpe, duration_sec, notes")
+    .in("session_id", sessionIds)
+    .order("set_number");
+
+  const setsBySession = new Map<number, typeof sets>();
+  for (const set of sets ?? []) {
+    const list = setsBySession.get(set.session_id) ?? [];
+    list.push(set);
+    setsBySession.set(set.session_id, list);
+  }
+
+  return sessions.map((s) => ({
+    ...s,
+    sets: setsBySession.get(s.id) ?? [],
+  }));
+}
+
+export async function getBodyCompEntries(days = 90) {
+  const supabase = await getSupabase();
+  const since = getLocalDateString(new Date(Date.now() - days * 24 * 60 * 60 * 1000));
+  const { data } = await supabase
+    .from("body_comp")
+    .select("date, weight_lbs, body_fat_pct, lean_mass_lbs, vo2_max, notes")
+    .gte("date", since)
+    .order("date", { ascending: false });
+  return data ?? [];
+}
+
+export async function getProgrammeWithExercises() {
+  const supabase = await getSupabase();
+  const { data: days } = await supabase
+    .from("programme_days")
+    .select("id, programme, day_number, day_name, focus")
+    .order("day_number");
+  if (!days || days.length === 0) return [];
+
+  const dayIds = days.map((d) => d.id);
+  const { data: exercises } = await supabase
+    .from("programme_exercises")
+    .select(
+      "day_id, exercise_order, exercise, sets, reps, target_rpe, rest_seconds, is_warmup, superset_group, notes",
+    )
+    .in("day_id", dayIds)
+    .order("exercise_order");
+
+  const exercisesByDay = new Map<number, typeof exercises>();
+  for (const ex of exercises ?? []) {
+    const list = exercisesByDay.get(ex.day_id) ?? [];
+    list.push(ex);
+    exercisesByDay.set(ex.day_id, list);
+  }
+
+  return days.map((d) => ({
+    ...d,
+    exercises: exercisesByDay.get(d.id) ?? [],
+  }));
+}
+
 // --- Programme ---
 
 export async function getProgrammeDays() {
