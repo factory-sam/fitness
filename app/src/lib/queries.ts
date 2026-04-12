@@ -664,3 +664,71 @@ export async function clearExpiredInsights() {
     .lt("expires_at", new Date().toISOString());
   if (error) throw error;
 }
+
+// --- Push Subscriptions ---
+
+export async function upsertPushSubscription(sub: {
+  endpoint: string;
+  p256dh_key: string;
+  auth_key: string;
+  user_agent?: string;
+}) {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("push_subscriptions")
+    .upsert(sub, { onConflict: "user_id,endpoint" });
+  if (error) throw error;
+}
+
+export async function deletePushSubscription(endpoint: string) {
+  const supabase = await getSupabase();
+  const { error } = await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
+  if (error) throw error;
+}
+
+// --- Notification Preferences ---
+
+export async function getNotificationPreferences() {
+  const supabase = await getSupabase();
+  const { data } = await supabase.from("notification_preferences").select("*").maybeSingle();
+  return data;
+}
+
+export async function upsertNotificationPreferences(prefs: Record<string, unknown>) {
+  const supabase = await getSupabase();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Unauthorized");
+
+  const { data, error } = await supabase
+    .from("notification_preferences")
+    .upsert({ user_id: user.id, ...prefs }, { onConflict: "user_id" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+// --- Notification Log ---
+
+export async function getNotificationHistory(limit = 20, type?: string) {
+  const supabase = await getSupabase();
+  let query = supabase
+    .from("notification_log")
+    .select("*")
+    .order("sent_at", { ascending: false })
+    .limit(limit);
+  if (type) query = query.eq("type", type);
+  const { data } = await query;
+  return data ?? [];
+}
+
+export async function markNotificationClicked(notificationId: number) {
+  const supabase = await getSupabase();
+  const { error } = await supabase
+    .from("notification_log")
+    .update({ clicked: true })
+    .eq("id", notificationId);
+  if (error) throw error;
+}
