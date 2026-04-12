@@ -22,17 +22,29 @@ jobs:
       (github.event_name == 'pull_request' && (contains(github.event.pull_request.body, '@droid') || contains(github.event.pull_request.title, '@droid')))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       issues: write
-      id-token: write
-      actions: read
+
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
-      - name: Run Droid Exec
-        uses: Factory-AI/droid-action@v3
-        with:
-          factory_api_key: ${{ secrets.FACTORY_API_KEY }}
+
+      - name: Setup droid CLI
+        run: |
+          curl -fsSL https://app.factory.ai/install.sh | sh
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Run Droid
+        env:
+          FACTORY_API_KEY: ${{ secrets.FACTORY_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          droid exec --auto high "
+          Respond to the @droid mention in this GitHub event.
+          Use the gh CLI to read the issue or PR context and post your response as a comment.
+          Repository: ${{ github.repository }}
+          Event: ${{ github.event_name }}
+          "
