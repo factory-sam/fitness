@@ -40,7 +40,7 @@ export function VitruvianMan({
   const regions = [
     { id: "shoulders", label: "Shoulders", top: "27%", left: "18%", width: "64%", height: "7%" },
     { id: "chest", label: "Chest", top: "35%", left: "30%", width: "40%", height: "7%" },
-
+    { id: "upper_arm_r", label: "Arm (R)", top: "36%", left: "14%", width: "14%", height: "12%" },
     { id: "waist", label: "Waist", top: "47%", left: "34%", width: "32%", height: "7%" },
     { id: "hips", label: "Hips", top: "54%", left: "32%", width: "36%", height: "7%" },
   ];
@@ -48,6 +48,7 @@ export function VitruvianMan({
   const measurementLines = [
     { id: "shoulders", y: "31%", x1: "20%", x2: "80%" },
     { id: "chest", y: "38%", x1: "30%", x2: "70%" },
+    { id: "upper_arm_r", y: "42%", x1: "16%", x2: "28%" },
     { id: "waist", y: "50%", x1: "36%", x2: "64%" },
     { id: "hips", y: "57%", x1: "33%", x2: "67%" },
   ];

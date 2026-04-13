@@ -100,7 +100,7 @@ Recommendations by scenario:
 Only flag exercises with 3+ sessions spanning 2+ weeks of data. One specific recommendation per exercise. Avoid false positives on exercises with normal session-to-session variation (±5 lbs).
 
 ## Body Composition Correlations (type: "body_comp", severity: "info" or "success")
-Call get_body_comp_trends, get_training_history(days: 30), and get_supplement_compliance.
+Call get_body_comp_trends, get_training_history(days: 30), and get_supplement_status.
 Only generate if 3+ body_comp entries exist spanning 2+ weeks.
 
 Correlation types to check:
@@ -126,7 +126,7 @@ Language rules:
 Compare this week's total sets to last week's. Note percentage change and whether progressive overload is on track.
 
 ## Supplement Compliance (type: "compliance", severity: "info" or "warning")
-Call get_supplement_compliance. Report adherence percentage. Flag specific missed supplements if adherence < 90%.`;
+Call get_supplement_status. Report adherence percentage. Flag specific missed supplements if adherence < 90%.`;
 
 export const PARSE_WORKOUT_PROMPT = `Parse the following natural language workout description into structured JSON.
 

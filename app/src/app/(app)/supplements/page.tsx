@@ -19,7 +19,7 @@ interface Supplement {
 
 interface LogEntry {
   supplement_id: number;
-  taken: number;
+  taken: boolean;
   time_taken: string | null;
 }
 
@@ -87,11 +87,9 @@ export default function SupplementsPage() {
     setTodayLog((prev) => {
       const existing = prev.find((l) => l.supplement_id === supplementId);
       if (existing) {
-        return prev.map((l) =>
-          l.supplement_id === supplementId ? { ...l, taken: taken ? 1 : 0 } : l,
-        );
+        return prev.map((l) => (l.supplement_id === supplementId ? { ...l, taken } : l));
       }
-      return [...prev, { supplement_id: supplementId, taken: taken ? 1 : 0, time_taken: null }];
+      return [...prev, { supplement_id: supplementId, taken, time_taken: null }];
     });
     try {
       const res = await fetch("/api/supplements/log", {
@@ -100,7 +98,7 @@ export default function SupplementsPage() {
         body: JSON.stringify({
           supplement_id: supplementId,
           date: today,
-          taken: taken ? 1 : 0,
+          taken,
           time_taken: new Date().toTimeString().slice(0, 5),
         }),
       });

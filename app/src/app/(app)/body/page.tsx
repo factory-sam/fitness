@@ -4,6 +4,7 @@ import {
   getLatestBodyComp,
   getLatestMeasurements,
 } from "../../../lib/queries";
+import { GOALS } from "../../../lib/constants";
 import { BodyCompChart } from "../../../components/dashboard/body-comp-chart";
 import { MeasurementDisplay } from "../../../components/body/measurement-display";
 import { LogWeighIn } from "../../../components/body/log-weigh-in";
@@ -43,12 +44,12 @@ export default async function BodyPage() {
         <div className="card text-center">
           <p className="metric-label">Body Fat</p>
           <p className="metric-value text-xl">{latestComp?.body_fat_pct ?? "—"}%</p>
-          <p className="type-micro text-text-muted">target: 12-18%</p>
+          <p className="type-micro text-text-muted">target: {GOALS.bodyFatRange}</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">S/W Ratio</p>
           <p className="metric-value-accent text-xl">{swRatio ?? "—"}</p>
-          <p className="type-micro text-text-muted">target: 1.57</p>
+          <p className="type-micro text-text-muted">target: {GOALS.swRatioTarget}</p>
         </div>
         <div className="card text-center">
           <p className="metric-label">VO₂ Max</p>
@@ -58,11 +59,7 @@ export default async function BodyPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <BodyCompChart history={bodyCompHistory} measurements={measurementHistory} />
-        <MeasurementDisplay
-          latest={latestMeasurements}
-          history={measurementHistory}
-          swRatio={swRatio}
-        />
+        <MeasurementDisplay latest={latestMeasurements} swRatio={swRatio} />
       </div>
     </div>
   );

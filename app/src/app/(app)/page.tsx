@@ -75,7 +75,7 @@ export default async function Dashboard() {
 
             <div className="space-y-6">
               {hasPRs && <PRBoard prs={prs} />}
-              <PullUpTimeline />
+              <PullUpTimeline exerciseNames={prs.map((p) => p.exercise)} />
             </div>
           </div>
         </>
@@ -84,7 +84,7 @@ export default async function Dashboard() {
       {!hasSessionData && !hasPRs && (
         <>
           <div className="h-px bg-border my-8" />
-          <PullUpTimeline />
+          <PullUpTimeline exerciseNames={prs.map((p) => p.exercise)} />
         </>
       )}
     </div>

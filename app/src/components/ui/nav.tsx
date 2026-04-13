@@ -17,19 +17,22 @@ const links = [
 export function Nav() {
   const pathname = usePathname();
   const [unread, setUnread] = useState(0);
+  const [userStats, setUserStats] = useState<{ weight?: number; bodyFat?: number } | null>(null);
 
   useEffect(() => {
-    fetch("/api/notifications/unread")
-      .then((r) => r.json())
-      .then((d) => setUnread(d.count ?? 0))
-      .catch(() => {});
-
-    const interval = setInterval(() => {
+    const fetchUnread = () =>
       fetch("/api/notifications/unread")
         .then((r) => r.json())
         .then((d) => setUnread(d.count ?? 0))
-        .catch(() => {});
-    }, 60_000);
+        .catch(() => undefined);
+
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 60_000);
+
+    fetch("/api/body-comp?latest=true")
+      .then((r) => r.json())
+      .then((d) => setUserStats({ weight: d.weight_lbs, bodyFat: d.body_fat_pct }))
+      .catch(() => undefined);
 
     return () => clearInterval(interval);
   }, []);
@@ -65,8 +68,16 @@ export function Nav() {
         ))}
       </div>
       <div className="mt-auto px-2 pt-6 border-t border-border-subtle">
-        <p className="type-micro text-text-muted">Sam</p>
-        <p className="type-micro text-text-muted">212 lbs · 25% BF</p>
+        <p className="type-micro text-text-muted">
+          {userStats?.weight != null || userStats?.bodyFat != null
+            ? [
+                userStats.weight != null ? `${userStats.weight} lbs` : null,
+                userStats.bodyFat != null ? `${userStats.bodyFat}% BF` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")
+            : "No body comp data"}
+        </p>
       </div>
     </nav>
   );

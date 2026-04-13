@@ -1,7 +1,10 @@
 import { getNotificationHistory } from "../../../../../lib/queries";
+import { requireAuth } from "../../../../../lib/api-auth";
 import log from "../../../../../lib/logger";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const url = new URL(request.url);
     const limitParam = url.searchParams.get("limit");

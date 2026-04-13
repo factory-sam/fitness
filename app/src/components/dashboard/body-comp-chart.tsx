@@ -87,49 +87,49 @@ export function BodyCompChart({
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1e1e1e" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" />
             <XAxis
               dataKey="date"
-              tick={{ fill: "#5a5650", fontSize: 10, fontFamily: "JetBrains Mono" }}
-              stroke="#2a2a2a"
+              tick={{ fill: "var(--color-text-muted)", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              stroke="var(--color-border)"
             />
             <YAxis
               yAxisId="left"
-              tick={{ fill: "#5a5650", fontSize: 10, fontFamily: "JetBrains Mono" }}
-              stroke="#2a2a2a"
+              tick={{ fill: "var(--color-text-muted)", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              stroke="var(--color-border)"
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fill: "#5a5650", fontSize: 10, fontFamily: "JetBrains Mono" }}
-              stroke="#2a2a2a"
+              tick={{ fill: "var(--color-text-muted)", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              stroke="var(--color-border)"
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#111111",
-                border: "1px solid #2a2a2a",
+                backgroundColor: "var(--color-bg-card)",
+                border: "1px solid var(--color-border)",
                 borderRadius: 6,
                 fontFamily: "JetBrains Mono",
                 fontSize: 11,
               }}
-              labelStyle={{ color: "#c9a84c" }}
+              labelStyle={{ color: "var(--color-gold)" }}
             />
             <Line
               yAxisId="left"
               type="monotone"
               dataKey="weight"
-              stroke="#c9a84c"
+              stroke="var(--color-gold)"
               strokeWidth={2}
-              dot={{ fill: "#c9a84c", r: 3 }}
+              dot={{ fill: "var(--color-gold)", r: 3 }}
               name="Weight (lbs)"
             />
             <Line
               yAxisId="right"
               type="monotone"
               dataKey="bf"
-              stroke="#5a8ec9"
+              stroke="var(--color-info)"
               strokeWidth={2}
-              dot={{ fill: "#5a8ec9", r: 3 }}
+              dot={{ fill: "var(--color-info)", r: 3 }}
               name="Body Fat %"
             />
           </LineChart>

@@ -3,9 +3,12 @@ import {
   getSupplementLogForDate,
   getSupplementLogRange,
 } from "../../../../../lib/queries";
+import { requireAuth } from "../../../../../lib/api-auth";
 import { getLocalDateString } from "../../../../../lib/date";
 
 export async function GET(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   const url = new URL(request.url);
   const date = url.searchParams.get("date");
   const startDate = url.searchParams.get("start");
@@ -13,20 +16,21 @@ export async function GET(request: Request) {
 
   if (date) {
     const log = await getSupplementLogForDate(date);
-    // Map boolean taken to number for client compatibility
-    return Response.json(log.map((l) => ({ ...l, taken: l.taken ? 1 : 0 })));
+    return Response.json(log);
   }
   if (startDate && endDate) {
     const log = await getSupplementLogRange(startDate, endDate);
-    return Response.json(log.map((l) => ({ ...l, taken: l.taken ? 1 : 0 })));
+    return Response.json(log);
   }
 
   const today = getLocalDateString();
   const log = await getSupplementLogForDate(today);
-  return Response.json(log.map((l) => ({ ...l, taken: l.taken ? 1 : 0 })));
+  return Response.json(log);
 }
 
 export async function POST(request: Request) {
+  const auth = await requireAuth();
+  if (auth.error) return auth.error;
   try {
     const body = await request.json();
     if (!body || typeof body !== "object" || !body.supplement_id) {
@@ -35,7 +39,7 @@ export async function POST(request: Request) {
     await logSupplementIntake({
       supplement_id: body.supplement_id,
       date: body.date ?? getLocalDateString(),
-      taken: body.taken === 1 || body.taken === true,
+      taken: body.taken === true,
       time_taken: body.time_taken,
       notes: body.notes,
     });

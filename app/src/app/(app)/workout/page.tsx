@@ -49,6 +49,7 @@ export default function WorkoutPage() {
   const [loggedSets, setLoggedSets] = useState<LoggedSet[]>([]);
   const [sessionNotes, setSessionNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showDiscardConfirm, setShowDiscardConfirm] = useState(false);
 
   const handleSelectDay = async (dayNumber: number) => {
@@ -73,7 +74,13 @@ export default function WorkoutPage() {
   const handleSave = async () => {
     if (!selectedDay || saving) return;
     setSaving(true);
+    setSaveError(null);
     try {
+      // Fetch current programme context for block/week
+      const statsRes = await fetch("/api/stats");
+      const stats = statsRes.ok ? await statsRes.json() : {};
+      const ctx = stats.programmeContext ?? {};
+
       const today = getLocalDateString();
       const res = await fetch("/api/sessions", {
         method: "POST",
@@ -82,8 +89,8 @@ export default function WorkoutPage() {
           date: today,
           name: selectedDay.day_name,
           programme: selectedDay.programme,
-          block: "Block 1",
-          week: 1,
+          block: ctx.block ?? null,
+          week: ctx.week ?? null,
           notes: sessionNotes,
           sets: loggedSets,
         }),
@@ -99,7 +106,12 @@ export default function WorkoutPage() {
         setSelectedDay(null);
         setLoggedSets([]);
         setSessionNotes("");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        setSaveError(err.error ?? "Failed to save workout. Please try again.");
       }
+    } catch {
+      setSaveError("Network error — workout not saved. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -152,6 +164,11 @@ export default function WorkoutPage() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+        {saveError && (
+          <div className="mx-6 mt-4 px-4 py-3 rounded border border-error/50 bg-error/10 text-error font-mono text-sm">
+            {saveError}
           </div>
         )}
         <WorkoutSummary
