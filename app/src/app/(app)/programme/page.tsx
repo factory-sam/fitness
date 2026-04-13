@@ -1,6 +1,7 @@
 import { createClient } from "../../../utils/supabase/server";
 import { cookies } from "next/headers";
 import { ProgrammeDayCard } from "../../../components/programme/programme-day-card";
+import { EmptyState } from "../../../components/ui/empty-state";
 import { getCurrentProgrammeContext } from "../../../lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -86,23 +87,34 @@ export default async function ProgrammePage() {
       </div>
 
       {/* Day cards — collapsible, single column */}
-      <div className="space-y-3">
-        {(days ?? []).map((day, i) => (
-          <ProgrammeDayCard
-            key={day.id}
-            dayNumber={day.day_number}
-            dayName={day.day_name}
-            focus={day.focus ?? ""}
-            exercises={
-              (exercisesByDay[day.id] ?? []).map((e: Record<string, unknown>) => ({
-                ...e,
-                is_warmup: e.is_warmup ? 1 : 0,
-              })) as Parameters<typeof ProgrammeDayCard>[0]["exercises"]
-            }
-            defaultOpen={i === 0}
+      {(days ?? []).length === 0 ? (
+        <div className="card">
+          <EmptyState
+            icon="▦"
+            title="No programme configured"
+            description="A training programme defines your weekly workout split — exercises, sets, reps, and rest periods for each day. Configure one to start tracking structured workouts."
+            action={{ label: "Start Workout", href: "/workout" }}
           />
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {(days ?? []).map((day, i) => (
+            <ProgrammeDayCard
+              key={day.id}
+              dayNumber={day.day_number}
+              dayName={day.day_name}
+              focus={day.focus ?? ""}
+              exercises={
+                (exercisesByDay[day.id] ?? []).map((e: Record<string, unknown>) => ({
+                  ...e,
+                  is_warmup: e.is_warmup ? 1 : 0,
+                })) as Parameters<typeof ProgrammeDayCard>[0]["exercises"]
+              }
+              defaultOpen={i === 0}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

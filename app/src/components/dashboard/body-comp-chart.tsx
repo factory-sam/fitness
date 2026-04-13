@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "../ui/empty-state";
 import {
   ResponsiveContainer,
   LineChart,
@@ -49,31 +50,33 @@ export function BodyCompChart({
     return (
       <div className="card">
         <h2 className="section-heading mb-4">Body Composition</h2>
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <span className="text-4xl mb-3 opacity-20">◉</span>
-          <p className="font-mono text-sm text-text-secondary">
-            Tracking body composition over time
-          </p>
-          <p className="font-mono text-xs text-text-muted mt-1">
-            Log weekly weigh-ins to see trends
-          </p>
-          {data.length === 1 && (
-            <div className="mt-4 grid grid-cols-3 gap-4">
-              <div className="text-center">
-                <p className="metric-value text-lg">{data[0].weight ?? "—"}</p>
-                <p className="metric-label">lbs</p>
-              </div>
-              <div className="text-center">
-                <p className="metric-value text-lg">{data[0].bf ?? "—"}%</p>
-                <p className="metric-label">body fat</p>
-              </div>
-              <div className="text-center">
-                <p className="metric-value text-lg">{data[0].vo2 ?? "—"}</p>
-                <p className="metric-label">VO₂ Max</p>
-              </div>
+        {data.length === 1 && (
+          <div className="mb-4 grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <p className="metric-value text-lg">{data[0].weight ?? "—"}</p>
+              <p className="metric-label">lbs</p>
             </div>
-          )}
-        </div>
+            <div className="text-center">
+              <p className="metric-value text-lg">{data[0].bf ?? "—"}%</p>
+              <p className="metric-label">body fat</p>
+            </div>
+            <div className="text-center">
+              <p className="metric-value text-lg">{data[0].vo2 ?? "—"}</p>
+              <p className="metric-label">VO₂ Max</p>
+            </div>
+          </div>
+        )}
+        <EmptyState
+          icon="◉"
+          title={data.length === 0 ? "No body composition data" : "Need more data points"}
+          description={
+            data.length === 0
+              ? "Log your weight, body fat, and measurements to track composition trends over time."
+              : "Log at least two weigh-ins to see your composition trend chart."
+          }
+          action={{ label: "Log Weigh-In", href: "/body" }}
+          compact={data.length === 1}
+        />
       </div>
     );
   }

@@ -1,3 +1,5 @@
+import { EmptyState } from "../ui/empty-state";
+
 interface PR {
   exercise?: string;
   max_weight?: number;
@@ -11,12 +13,13 @@ export function PRBoard({ prs }: { prs: PR[] }) {
     return (
       <div className="card">
         <h2 className="section-heading mb-3">Personal Records</h2>
-        <div className="py-6 text-center">
-          <span className="text-2xl opacity-20">🏆</span>
-          <p className="font-mono text-xs text-text-muted mt-2">
-            PRs appear after logging sessions
-          </p>
-        </div>
+        <EmptyState
+          icon="🏆"
+          title="No personal records yet"
+          description="Your heaviest lifts for each exercise will be tracked here automatically as you log workouts."
+          action={{ label: "Start Workout", href: "/workout" }}
+          compact
+        />
       </div>
     );
   }
