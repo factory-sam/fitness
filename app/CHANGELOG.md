@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.5](https://github.com/factory-sam/fitness/compare/vitruvian-v0.1.4...vitruvian-v0.1.5) (2026-04-12)
+
+
+### Bug Fixes
+
+* comprehensive non-functional code audit ([65ee447](https://github.com/factory-sam/fitness/commit/65ee4473a02bead2cc35a1ac2c9b40afe8616464))
+* comprehensive non-functional code audit ([122a849](https://github.com/factory-sam/fitness/commit/122a849e95763f8baaa44f5881024f0819a1a17e))
+* use exact match for pullup milestone matching ([39d50db](https://github.com/factory-sam/fitness/commit/39d50db5315759a2e4139bc7387db5c627296adf))
+
 ## [0.1.4](https://github.com/factory-sam/fitness/compare/vitruvian-v0.1.3...vitruvian-v0.1.4) (2026-04-12)
 
 
