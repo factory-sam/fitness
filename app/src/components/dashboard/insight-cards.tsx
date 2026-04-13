@@ -20,11 +20,13 @@ const SEVERITY_COLOR: Record<string, string> = {
 };
 
 function InsightCard({ insight }: { insight: AIInsight }) {
+  const [expanded, setExpanded] = useState(false);
   const config = TYPE_CONFIG[insight.type] ?? TYPE_CONFIG.volume_trend;
   const color = insight.severity
     ? (SEVERITY_COLOR[insight.severity] ?? config.defaultColor)
     : config.defaultColor;
   const isActionable = insight.type === "plateau_alert";
+  const isLong = insight.content.length > 120;
 
   return (
     <div className={`card relative ${isActionable ? "border-l-2 border-l-gold" : ""}`}>
@@ -33,7 +35,21 @@ function InsightCard({ insight }: { insight: AIInsight }) {
         <span className="type-label text-text-muted">{config.label}</span>
       </div>
       <p className="font-serif text-sm text-text mb-1">{insight.title}</p>
-      <p className="type-caption text-text-secondary leading-relaxed">{insight.content}</p>
+      <p
+        className={`type-caption text-text-secondary leading-relaxed ${
+          !expanded && isLong ? "line-clamp-2" : ""
+        }`}
+      >
+        {insight.content}
+      </p>
+      {isLong && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="type-micro text-gold-dim hover:text-gold transition-colors mt-1"
+        >
+          {expanded ? "Show less" : "Read more"}
+        </button>
+      )}
     </div>
   );
 }
