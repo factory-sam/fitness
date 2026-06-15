@@ -1,19 +1,16 @@
 name: Droid Wiki Refresh
-
-on:
+"on":
   push:
-    branches: [main]
-
+    branches:
+      - main
 concurrency:
   group: wiki-refresh
   cancel-in-progress: true
-
 jobs:
   wiki-refresh:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Install and run Factory Droid
         run: |
           curl -fsSL https://app.factory.ai/cli | sh
